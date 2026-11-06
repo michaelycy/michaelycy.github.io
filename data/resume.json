@@ -1,0 +1,780 @@
+{
+  "schemaVersion": 1,
+  "updatedOn": "2026-10-27",
+  "profile": {
+    "name": "母朝阳",
+    "github": "https://github.com/michaelycy",
+    "handle": "michaelycy",
+    "email": "michaely@aliyun.com",
+    "years": 14,
+    "summary": "14 年软件开发经验，长期参与企业级前端架构、工程基建、团队协作与项目交付，近期承担 AI 应用、文档质检工具及企业门户全栈开发。"
+  },
+  "views": {
+    "前端高级开发": {
+      "focus": [
+        "前端架构",
+        "复杂交互",
+        "跨端开发",
+        "性能与状态一致性",
+        "工程化"
+      ],
+      "projectIds": [
+        "document-translation",
+        "agent-platform",
+        "operations-microfrontend",
+        "industrial-visualization",
+        "retail-miniapp",
+        "survey-platform",
+        "document-quality",
+        "corporate-portal",
+        "bilingual-portal"
+      ]
+    },
+    "前端Leader": {
+      "focus": [
+        "架构治理",
+        "技术评审",
+        "成员培养",
+        "工程效能",
+        "跨团队与现场交付"
+      ],
+      "projectIds": [
+        "operations-microfrontend",
+        "multichannel-commerce",
+        "industrial-visualization",
+        "frontend-ecosystem",
+        "document-translation",
+        "agent-platform",
+        "document-quality",
+        "corporate-portal",
+        "bilingual-portal"
+      ]
+    },
+    "全栈开发": {
+      "focus": [
+        "服务端业务",
+        "数据与异步任务",
+        "接口契约",
+        "前后端状态",
+        "多端交付"
+      ],
+      "projectIds": [
+        "document-translation",
+        "agent-platform",
+        "design-code-tool",
+        "multichannel-commerce",
+        "document-quality",
+        "corporate-portal",
+        "bilingual-portal"
+      ]
+    },
+    "AI应用开发": {
+      "focus": [
+        "模型调用治理",
+        "Agent 工具集成",
+        "RAG",
+        "文档处理",
+        "流式人机交互"
+      ],
+      "projectIds": [
+        "document-translation",
+        "agent-platform"
+      ]
+    }
+  },
+  "employment": [
+    {
+      "id": "career-1",
+      "name": "上海比孚信息科技有限公司",
+      "period": "2026.06-2026.10",
+      "role": "全栈开发",
+      "details": []
+    },
+    {
+      "id": "career-2",
+      "name": "独立开发者",
+      "period": "2025.11-2026.05",
+      "role": "全栈开发",
+      "details": []
+    },
+    {
+      "id": "career-3",
+      "name": "奇利匙信息技术（上海）有限公司",
+      "period": "2022.11-2025.09",
+      "role": "大前端 Leader",
+      "details": []
+    },
+    {
+      "id": "career-4",
+      "name": "上海快仓智能科技有限公司",
+      "period": "2021.12-2022.11",
+      "role": "前端 Leader",
+      "details": []
+    },
+    {
+      "id": "career-5",
+      "name": "上海易恒健康科技有限公司",
+      "period": "2021.04-2021.12",
+      "role": "前端 Leader",
+      "details": []
+    },
+    {
+      "id": "career-6",
+      "name": "杭州数云信息技术有限公司",
+      "period": "2014.08-2021.04",
+      "role": "高级前端开发工程师",
+      "details": []
+    },
+    {
+      "id": "career-7",
+      "name": "南京安讯科技有限责任公司",
+      "period": "2012.06-2014.08",
+      "role": ".NET 开发工程师",
+      "details": []
+    }
+  ],
+  "projects": [
+    {
+      "id": "document-translation",
+      "name": "AI 文档翻译平台",
+      "completeness": "detailed",
+      "role": "全栈开发",
+      "period": "2026.06-至今",
+      "periodContext": "",
+      "background": "解析、OCR、翻译与人工校准的完整工作流。",
+      "stack": [
+        "React 19",
+        "TypeScript",
+        "Vite",
+        "TanStack Router/Query",
+        "TanStack Table/Virtual",
+        "PDF.js",
+        "Taro 4",
+        "FastAPI",
+        "SQLModel",
+        "PostgreSQL",
+        "Celery",
+        "Redis",
+        "PydanticAI",
+        "Codex CLI",
+        "Claude Agent SDK",
+        "PaddleOCR",
+        "Docker"
+      ],
+      "responsibilities": [
+        "参与文档解析、OCR、翻译、人工校准与导出的全栈开发。",
+        "实现异步任务编排、状态同步与异常恢复。",
+        "处理文档编辑中的坐标转换、拖拽、缩放及渲染性能。"
+      ],
+      "relatedProjectIds": [],
+      "cases": [
+        {
+          "challenge": "长时任务需要在刷新或断连后保持可查询的进度。",
+          "approach": "结合任务状态持久化、实时通知和查询接口同步前后端状态。"
+        },
+        {
+          "challenge": "文档编辑需要在不同坐标空间之间保持位置一致。",
+          "approach": "统一几何数据转换，并协调页面渲染与编辑状态。"
+        }
+      ]
+    },
+    {
+      "id": "agent-platform",
+      "name": "企业级 AI 智能体与知识库平台",
+      "completeness": "detailed",
+      "role": "全栈开发",
+      "period": "2026.06-2026.09",
+      "periodContext": "",
+      "background": "可视化工作流、知识检索与工具集成。",
+      "stack": [
+        "Vue 3",
+        "TypeScript",
+        "Vue Flow",
+        "Tiptap/ProseMirror",
+        "TanStack Table/Virtual",
+        "ELK",
+        "pnpm Monorepo",
+        "Java 21",
+        "Spring Boot",
+        "Spring AI",
+        "AgentScope",
+        "PostgreSQL",
+        "Redis",
+        "Elasticsearch",
+        "Milvus",
+        "Neo4j",
+        "SSE",
+        "WebSocket"
+      ],
+      "responsibilities": [
+        "开发可视化工作流画布、节点配置、版本切换与运行调试。",
+        "参与知识库、模型调用、检索与工具集成。",
+        "建设共享组件、对话交互和前后端传输能力。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "retail-miniapp",
+      "name": "零售品牌微信小程序",
+      "completeness": "detailed",
+      "role": "前端负责人",
+      "period": "2025—2026",
+      "periodContext": "",
+      "background": "Taro 与 React 跨端小程序，支持动态内容配置和国际化。",
+      "stack": [
+        "Taro 4",
+        "React",
+        "TypeScript",
+        "Sass",
+        "Unocss",
+        "taroify",
+        "TanStack Query"
+      ],
+      "responsibilities": [
+        "负责跨端前端架构与技术选型。",
+        "封装动态内容组件，支持内容配置和多语言渲染。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "enterprise-commerce",
+      "name": "企业级电商平台",
+      "completeness": "detailed",
+      "role": "前端负责人",
+      "period": "2025.01-2025.06",
+      "periodContext": "",
+      "background": "企业级电商前端，支持动态内容、多语言与移动端适配。",
+      "stack": [
+        "Angular 19",
+        "Spartacus (SAP)",
+        "TypeScript",
+        "ngrx",
+        "Tailwind CSS",
+        "ng-zorro-antd",
+        "Sass",
+        "SonarQube"
+      ],
+      "responsibilities": [
+        "主导 Angular 前端架构与电商框架集成。",
+        "定制内容渲染、路由及状态管理，支持多语言与移动端。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "brand-omnichannel",
+      "name": "品牌全渠道电商小程序",
+      "completeness": "detailed",
+      "role": "前端技术负责人",
+      "period": "2023.11-2025.06",
+      "periodContext": "",
+      "background": "连接商品、订单与活动业务的多平台电商小程序。",
+      "stack": [
+        "微信/京东小程序 Taro+Vue",
+        "天猫原生小程序",
+        "TypeScript",
+        "Pinia",
+        "Sass"
+      ],
+      "responsibilities": [
+        "制定不同小程序平台的前端技术方案。",
+        "实现首页配置、商品详情和订单等电商交互。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "multichannel-commerce",
+      "name": "全渠道商城与微信小程序",
+      "completeness": "detailed",
+      "role": "前端 Leader",
+      "period": "2023.03-2025.03",
+      "periodContext": "",
+      "background": "覆盖 PC 商城与微信小程序的多端电商平台。",
+      "stack": [
+        "小程序：原生小程序",
+        "TypeScript",
+        "Vant",
+        "Sass",
+        "GraphQL",
+        "Jenkins",
+        "PC：Vue3",
+        "Nuxt3",
+        "TypeScript",
+        "Ant Design Vue",
+        "Sass",
+        "Vite",
+        "GraphQL",
+        "Docker"
+      ],
+      "responsibilities": [
+        "负责双端技术选型与架构，使用服务端渲染支持 PC 商城。",
+        "规划小程序分包、模块协作与发布流程。",
+        "推进性能优化、搜索引擎优化与数据监控。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "industrial-commerce",
+      "name": "工业品电商平台",
+      "completeness": "detailed",
+      "role": "前端负责人",
+      "period": "2023—2024",
+      "periodContext": "",
+      "background": "对接商品、品类、订单与活动业务的企业电商平台。",
+      "stack": [
+        "React",
+        "Next.js",
+        "Webpack",
+        "Sass",
+        "Mobx",
+        "Docker"
+      ],
+      "responsibilities": [
+        "主导 React 与 Next.js 前端架构及组件分层。",
+        "实现订单查询、提交与状态跟踪等业务流程。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "operations-microfrontend",
+      "name": "企业数字化运营平台",
+      "completeness": "detailed",
+      "role": "前端 Leader",
+      "period": "2022.12-2024.02",
+      "periodContext": "",
+      "background": "微前端架构、组件体系与工程规范。",
+      "stack": [
+        "React",
+        "Vue2",
+        "TypeScript",
+        "Qiankun",
+        "Valtio/Redux",
+        "Webpack",
+        "Docker"
+      ],
+      "responsibilities": [
+        "负责微前端技术选型、应用通信、隔离及路由方案。",
+        "建设基础组件库、业务组件库与应用开发模板。",
+        "统一开发规范、构建与部署流程，支持团队协作。"
+      ],
+      "relatedProjectIds": [],
+      "cases": [
+        {
+          "challenge": "不同技术栈的业务应用需要协作与独立交付。",
+          "approach": "划分主子应用职责，统一接入约定与公共工程能力。"
+        }
+      ]
+    },
+    {
+      "id": "industrial-handheld",
+      "name": "工业手持终端与控制应用",
+      "completeness": "detailed",
+      "role": "前端 Leader",
+      "period": "2022.09-2022.10",
+      "periodContext": "",
+      "background": "工业终端的设备监控、指令下发与现场数据采集。",
+      "stack": [
+        "React",
+        "Taro",
+        "Mobx",
+        "SCSS",
+        "i18next",
+        "React Query",
+        "Ant Design Mobile",
+        "Pixi.js"
+      ],
+      "responsibilities": [
+        "主导 Taro 手持端架构并适配不同工业终端。",
+        "实现设备状态、地图点位和操作指令的多端联动。"
+      ],
+      "relatedProjectIds": [
+        "industrial-visualization"
+      ],
+      "cases": []
+    },
+    {
+      "id": "industrial-visualization",
+      "name": "工业地图编辑与监控系统",
+      "completeness": "detailed",
+      "role": "前端 Leader",
+      "period": "2021—2022",
+      "periodContext": "",
+      "background": "地图编辑、可视化监控与工业场景交互。",
+      "stack": [
+        "React",
+        "Mobx",
+        "Pixi.js",
+        "SCSS",
+        "Webpack",
+        "i18next",
+        "Ant Design",
+        "React Query",
+        "Axios"
+      ],
+      "responsibilities": [
+        "建设 React 低代码界面与配置化渲染能力。",
+        "实现地图编辑、监控展示与可扩展业务控件。",
+        "处理复杂画布交互与渲染性能。"
+      ],
+      "relatedProjectIds": [
+        "industrial-handheld",
+        "factory-testing"
+      ],
+      "cases": [
+        {
+          "challenge": "监控界面与地图业务需要适配不同配置。",
+          "approach": "结合配置协议、可复用控件和画布交互组织界面。"
+        }
+      ]
+    },
+    {
+      "id": "factory-testing",
+      "name": "工厂配置与生产测试系统",
+      "completeness": "detailed",
+      "role": "前端 Leader",
+      "period": "2021.12-2022.10",
+      "periodContext": "",
+      "background": "工厂测试任务、实时监控、报表与异常预警系统。",
+      "stack": [
+        "Vue",
+        "Webpack",
+        "Sass",
+        "Vuex",
+        "Element UI",
+        "Avue",
+        "G2",
+        "X6",
+        "Qiankun",
+        "MathQuill"
+      ],
+      "responsibilities": [
+        "主导前端架构与选型，支持实时数据及多角色操作。",
+        "统筹测试任务、监控、报表与预警模块的开发联调。"
+      ],
+      "relatedProjectIds": [
+        "industrial-visualization"
+      ],
+      "cases": []
+    },
+    {
+      "id": "survey-platform",
+      "name": "低代码问卷产品体系",
+      "completeness": "detailed",
+      "role": "前端 Leader",
+      "period": "2021.05-2021.12",
+      "periodContext": "",
+      "background": "低代码问卷配置与小程序、H5 渲染体系。",
+      "stack": [
+        "移动端：React",
+        "Taro",
+        "Taro-UI",
+        "Mobx",
+        "TypeScript",
+        "Webpack",
+        "React Query",
+        "管理端：React",
+        "Qiankun",
+        "TypeScript",
+        "Webpack",
+        "React Query"
+      ],
+      "responsibilities": [
+        "开发可配置布局、丰富题型及跨端渲染能力。",
+        "实现页面预览、实时保存与大表单局部保存。"
+      ],
+      "relatedProjectIds": [
+        "react-component-system"
+      ],
+      "cases": []
+    },
+    {
+      "id": "react-component-system",
+      "name": "React 组件库与前端工具体系",
+      "completeness": "detailed",
+      "role": "前端 Leader",
+      "period": "2021.04-2021.05",
+      "periodContext": "",
+      "background": "React 组件库与前端工具体系，关注兼容与迁移成本。",
+      "stack": [
+        "React",
+        "Ant Design",
+        "Webpack",
+        "Gulp"
+      ],
+      "responsibilities": [
+        "基于 Ant Design 二次开发组件，兼顾 API 兼容和迁移成本。",
+        "处理样式隔离、组件封装及动态主题。"
+      ],
+      "relatedProjectIds": [
+        "survey-platform",
+        "vue-component-system"
+      ],
+      "cases": []
+    },
+    {
+      "id": "frontend-ecosystem",
+      "name": "企业级前端生态体系",
+      "completeness": "detailed",
+      "role": "架构师",
+      "period": "2020.05-2021.04",
+      "periodContext": "",
+      "background": "组件库、研发工具与企业级前端生态。",
+      "stack": [
+        "React",
+        "Webpack",
+        "Gulp",
+        "Ant Design",
+        "Node.js"
+      ],
+      "responsibilities": [
+        "基于 Ant Design 建设组件库，协同设计团队统一交互规范。",
+        "建设工具库、SDK、开发规范、规则编辑器与脚手架。"
+      ],
+      "relatedProjectIds": [
+        "modular-crm"
+      ],
+      "cases": []
+    },
+    {
+      "id": "modular-crm",
+      "name": "模块化 CRM 产品体系",
+      "completeness": "detailed",
+      "role": "架构师 + 前端开发",
+      "period": "2020.01-2021.02",
+      "periodContext": "",
+      "background": "支持独立部署、动态组合与 Dashboard 定制的 CRM。",
+      "stack": [
+        "React",
+        "Qiankun",
+        "Styled-Components",
+        "Mobx",
+        "TanStack Query",
+        "TypeScript",
+        "Webpack",
+        "Sass"
+      ],
+      "responsibilities": [
+        "实现微前端主子应用拆分与集成。",
+        "支持跨应用组件嵌入、动态编排与 Dashboard 定制。"
+      ],
+      "relatedProjectIds": [
+        "crm-foundation",
+        "frontend-ecosystem"
+      ],
+      "cases": []
+    },
+    {
+      "id": "design-code-tool",
+      "name": "设计规范与代码转换工具",
+      "completeness": "detailed",
+      "role": "架构师",
+      "period": "2020.01-2020.06",
+      "periodContext": "",
+      "background": "将 Sketch 设计规范转换为组件代码与配置。",
+      "stack": [
+        "Node.js",
+        "TypeScript",
+        "Rollup",
+        "Sketch"
+      ],
+      "responsibilities": [
+        "解析 Sketch 文件并提取结构化设计数据。",
+        "连接设计规范、组件库与代码生成流程。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "crm-foundation",
+      "name": "CRM 微前端基座与业务子应用",
+      "completeness": "detailed",
+      "role": "架构师",
+      "period": "2016.01-2021.04",
+      "periodContext": "",
+      "background": "CRM 微前端基座与忠诚度、数据模型等业务子应用。",
+      "stack": [
+        "React",
+        "Ant Design",
+        "JSS",
+        "Webpack",
+        "Mobx",
+        "Single-SPA"
+      ],
+      "responsibilities": [
+        "搭建 React 子应用开发环境与微前端基座。",
+        "处理应用通信、样式隔离与业务模块集成。"
+      ],
+      "relatedProjectIds": [
+        "modular-crm"
+      ],
+      "cases": []
+    },
+    {
+      "id": "health-commerce",
+      "name": "健康服务商城",
+      "completeness": "brief",
+      "role": "前端架构与核心功能开发",
+      "period": "2021",
+      "periodContext": "相关任职期间",
+      "background": "商城前端架构与核心功能开发，涵盖系统开发、联调与上线。",
+      "stack": [],
+      "responsibilities": [
+        "承担商城前端架构与核心功能开发。",
+        "推进系统开发、联调与上线。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "vue-component-system",
+      "name": "Vue 组件库",
+      "completeness": "brief",
+      "role": "开发与维护",
+      "period": "2021",
+      "periodContext": "相关任职期间",
+      "background": "Vue 组件库开发与维护，支持历史项目 UI 统一与技术升级。",
+      "stack": [
+        "Vue"
+      ],
+      "responsibilities": [
+        "参与 Vue 组件库开发与维护，支持历史项目 UI 统一与技术升级。"
+      ],
+      "relatedProjectIds": [
+        "react-component-system"
+      ],
+      "cases": []
+    },
+    {
+      "id": "mobile-portal",
+      "name": "移动门户改版",
+      "completeness": "brief",
+      "role": ".NET 开发工程师（任职职称）",
+      "period": "2012—2014",
+      "periodContext": "相关任职期间",
+      "background": "移动门户、活动页面与新闻采集功能开发。",
+      "stack": [
+        "Zepto.js",
+        "JavaScript",
+        "CSS",
+        ".NET",
+        "MySQL"
+      ],
+      "responsibilities": [
+        "基于 JavaScript、.NET 与 MySQL 开发移动站点。",
+        "开发活动页面及新闻采集功能。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "document-quality",
+      "name": "文档版式质检平台",
+      "completeness": "detailed",
+      "role": "全栈开发",
+      "period": "2026.09-至今",
+      "periodContext": "",
+      "background": "文档结构化比较、风险定位与人工复核。",
+      "stack": [
+        "React 19",
+        "TypeScript",
+        "Vite",
+        "Ant Design",
+        "TanStack Router / Query",
+        "Tailwind CSS",
+        "Python",
+        "FastAPI",
+        "Uvicorn",
+        "Pydantic v2",
+        "PyMuPDF",
+        "NumPy",
+        "SciPy",
+        "SQLite",
+        "LibreOffice headless",
+        "openpyxl",
+        "Jinja2",
+        "uv workspace",
+        "Ruff",
+        "mypy",
+        "GitHub Actions",
+        "可选 PaddleOCR / MCP"
+      ],
+      "responsibilities": [
+        "参与文档比较、结果定位、人工复核与历史报告的全栈开发。",
+        "组织文档处理引擎、服务端接口与前端工作台。",
+        "实现异步比较任务与可追溯的风险报告。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "corporate-portal",
+      "name": "企业品牌官网",
+      "completeness": "detailed",
+      "role": "全栈开发",
+      "period": "2026.10-至今",
+      "periodContext": "",
+      "background": "企业品牌官网与新闻内容管理的全栈开发。",
+      "stack": [
+        "Nuxt 4",
+        "Vue 3",
+        "TypeScript",
+        "SCSS",
+        "Nitro/Node.js",
+        "SQLite",
+        "Drizzle ORM",
+        "MCP 官方服务端 SDK",
+        "Zod",
+        "marked",
+        "sanitize-html",
+        "Nginx"
+      ],
+      "responsibilities": [
+        "组织 Nuxt 官网的页面、布局、业务组件与服务端业务。",
+        "建设响应式主题与可复用详情模板。",
+        "参与新闻内容维护、预览与发布流程。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    },
+    {
+      "id": "bilingual-portal",
+      "name": "双语品牌门户",
+      "completeness": "detailed",
+      "role": "全栈开发",
+      "period": "2026.10-至今",
+      "periodContext": "",
+      "background": "中英文品牌门户，结合预渲染页面与动态新闻服务。",
+      "stack": [
+        "Nuxt 4",
+        "Vue 3",
+        "TypeScript",
+        "@nuxtjs/i18n",
+        "SCSS",
+        "Nitro/H3",
+        "SQLite",
+        "Drizzle ORM",
+        "MCP SDK",
+        "Zod",
+        "marked",
+        "sanitize-html",
+        "pnpm",
+        "PM2",
+        "Docker",
+        "Nginx"
+      ],
+      "responsibilities": [
+        "搭建 Nuxt 与 Nitro 全栈门户，统一中英文页面及服务。",
+        "结合预渲染与服务端渲染实现栏目和新闻展示。",
+        "处理语言化路由、搜索引擎优化与内容维护流程。"
+      ],
+      "relatedProjectIds": [],
+      "cases": []
+    }
+  ],
+  "version": "1a9d6b291295"
+}
