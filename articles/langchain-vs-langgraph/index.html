@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="用工具调用和审批流程说明两个框架各管哪一层、什么时候用。">
+  <title>LangChain 与 LangGraph 的区别和选型 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">Agent 架构与选型</p><h1>LangChain 与 LangGraph 的区别和选型</h1><ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>LangChain</li><li>LangGraph</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">一、先更新对 LangChain 的印象</a></li><li><a href="#section-2">二、看差异时，重点看控制权在哪</a></li><li><a href="#section-3">三、标准工具循环适合先用 LangChain</a></li><li><a href="#section-4">四、流程本身是业务资产时，考虑显式画图</a></li><li><a href="#section-5">五、持久化不是断点续传的完整承诺</a></li><li><a href="#section-6">六、按这些场景做初步选择</a></li><li><a href="#section-7">七、旧项目升级时，先检查接口和行为</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>做一个能查制度、调用工具的助手，经常会遇到这个问题：先用 LangChain，还是直接用 LangGraph？如果把两者理解成只能二选一的竞争框架，后面很容易判断错。</p>
+<p>按当前 Python 文档，LangChain 的 <code>create_agent</code> 使用 LangGraph 作为底层运行基础。LangChain 提供标准 Agent 循环、模型与工具抽象以及中间件；LangGraph 提供更底层的状态和控制流编排。选型主要取决于：标准循环能否表达你的任务，还是需要自己明确管理步骤、分支和恢复边界。<a href="https://www.langchain.com/oss-overview">官方栈关系说明</a></p>
+<h2 id="section-1">一、先更新对 LangChain 的印象</h2>
+<p>早期教程里的 LangChain，常围绕 Chain、Memory 和 AgentExecutor 展开。现在新建标准 Agent，官方入口主要是 <code>langchain.agents.create_agent</code>。它负责模型选择工具、读取工具结果、继续调用或返回答案的循环，可以通过中间件插入业务控制。<a href="https://docs.langchain.com/oss/python/langchain/overview">LangChain 概览</a></p>
+<p>LangGraph 允许直接定义共享状态、节点和边，组合确定步骤与模型决策。图可以表示单 Agent 的循环、纯确定流程，也可以表示多个执行单元之间的协作。因此，“单 Agent 用 LangChain，多 Agent 用 LangGraph”只是一个过于粗略的说法。<a href="https://docs.langchain.com/oss/python/langgraph/overview">LangGraph 概览</a></p>
+<p>还需要分清生态中各个名字：LangChain 和 LangGraph 有开源库；LangSmith 提供观测、评估和部署相关产品；Deep Agents 是更高层的 Agent harness。开源代码采用某个库，不代表必须采购同名生态中的全部托管服务，具体能力、部署方式和费用需要单独评估。</p>
+<h2 id="section-2">二、看差异时，重点看控制权在哪</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>关注点</th>
+<th>LangChain 的标准 Agent 入口</th>
+<th>直接使用 LangGraph</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主要抽象</td>
+<td>模型、工具、消息、中间件</td>
+<td>状态、节点、边、子图</td>
+</tr>
+<tr>
+<td>执行结构</td>
+<td>以标准模型与工具循环为中心</td>
+<td>由应用显式定义控制流</td>
+</tr>
+<tr>
+<td>状态处理</td>
+<td>在标准 Agent 状态上扩展</td>
+<td>自己设计业务状态与合并方式</td>
+</tr>
+<tr>
+<td>中断与持久化</td>
+<td>可以使用底层能力，并非没有</td>
+<td>直接围绕这些边界设计流程</td>
+</tr>
+<tr>
+<td>自定义代价</td>
+<td>标准任务上代码较少</td>
+<td>需要自己设计更多运行语义</td>
+</tr>
+<tr>
+<td>典型使用方式</td>
+<td>快速组装受控的工具型助手</td>
+<td>复杂分支、长任务和明确恢复边界</td>
+</tr>
+</tbody>
+</table></div>
+<p>两者都不会自动解决业务幂等、租户鉴权、内容真实性和工具可靠性。持久化后端、权限检查和发布策略仍需要应用自己配置与实现。</p>
+<p>LangGraph 节点里可以使用 LangChain 的模型和工具，也可以直接调用供应商 SDK 或普通 Python 函数。一个系统还可以在外层图中管理流程，某个局部步骤使用标准 Agent 循环。没有必要为了技术名称统一，把所有普通函数都包装成 Agent。</p>
+<h2 id="section-3">三、标准工具循环适合先用 LangChain</h2>
+<p>比如内部助手有三个只读能力：查制度、查当前申请、解释字段。用户问什么、先查哪一个会有变化，但整体模式就是“理解问题、调用工具、综合回答”。这时先用标准入口，能更快建立可评估的基线。</p>
+<p>下面是接口用法示例，工具只返回演示文本，没有接入真实制度。运行需要安装兼容版本的 LangChain、对应模型集成包，并配置 <code>AGENT_MODEL</code> 与供应商凭证。</p>
+<pre><code class="language-python">import os
+
+from langchain.agents import create_agent
+from langchain.tools import tool
+
+
+@tool
+def lookup_demo_policy(topic: str) -&gt; str:
+    &quot;&quot;&quot;查询演示资料，仅用于验证工具调用，不代表真实企业制度。&quot;&quot;&quot;
+    return f&quot;演示查询主题：{topic}。尚未接入真实资料，不能据此判断业务规则。&quot;
+
+
+agent = create_agent(
+    model=os.environ[&quot;AGENT_MODEL&quot;],
+    tools=[lookup_demo_policy],
+    system_prompt=&quot;资料为演示数据。缺少真实证据时明确说明，不编造企业规定。&quot;,
+)
+
+result = agent.invoke({
+    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;请查询住宿标准的相关资料。&quot;}]
+})
+</code></pre>
+<p>真实工具应从服务端运行上下文读取身份，不接受模型自行指定租户或凭证。工具返回也要包含状态和证据引用，不能把异常全部压成一段普通答案。</p>
+<p>如果要限制工具使用、修改动态提示、做摘要或插入人工审查，可以先检查中间件是否足以表达需求。LangChain 的中间件提供 Agent 循环前后和调用周围的控制入口。<a href="https://docs.langchain.com/oss/python/langchain/middleware/overview">中间件文档</a></p>
+<h2 id="section-4">四、流程本身是业务资产时，考虑显式画图</h2>
+<p>再看差旅申请：读取适用制度、补齐条件、生成草案、等待确认、检查对象是否变化、提交、核对最终结果。某些节点必须执行，某些节点只能在授权后执行，失败后也有不同去向。</p>
+<p>这种情况下，直接使用 LangGraph 更容易表达各个状态转移。把审批、提交和结果核对放在不同边界，也更方便测试和恢复。</p>
+<p><a class="article-figure" href="../assets/05-workflow-control.svg" title="查看原图"><img src="../assets/05-workflow-control.svg" alt="包含授权失效与结果未知出口的业务流程" loading="lazy"></a></p>
+<details>
+<summary>查看 Mermaid 源码</summary>
+<pre><code class="language-mermaid">flowchart TD
+    A[读取任务与身份] --&gt; B[检索并验证条件]
+    B --&gt; C{条件完整吗}
+    C --&gt;|不完整| D[等待补充]
+    D --&gt; B
+    C --&gt;|完整| E[生成申请草案]
+    E --&gt; F[等待确认]
+    F --&gt;|确认| G{授权与对象版本仍有效吗}
+    F --&gt;|拒绝 撤回或过期| X[停止当前动作]
+    G --&gt;|有效| H[幂等提交]
+    G --&gt;|失效| Y[停止并重新确认]
+    H --&gt; I{结果确定吗}
+    I --&gt;|确定| J[记录对应业务状态]
+    I --&gt;|未知| K[查询并核对外部状态]
+    K --&gt;|结果已确认| J
+    K --&gt;|仍未知或核对超时| Z[转人工并保留未知状态]
+</code></pre>
+</details>
+<p>图中保留了授权失效和核对失败的出口。等待补充条件还要有期限，各节点的依赖异常也要按任务策略结束或转人工。远端已受理但尚未完成时，记录处理中状态，通过后续事件继续推进，不能立即标记任务成功。</p>
+<p>下面的本地示例只演示“等待确认后选分支”。它没有模型调用，也不会执行真实业务写操作。</p>
+<pre><code class="language-python">from typing import TypedDict
+
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph import END, START, StateGraph
+from langgraph.types import Command, interrupt
+
+
+class State(TypedDict, total=False):
+    request: str
+    approved: bool
+    outcome: str
+
+
+def review(state: State):
+    decision = interrupt({&quot;request&quot;: state[&quot;request&quot;], &quot;mode&quot;: &quot;simulation&quot;})
+    return {&quot;approved&quot;: decision is True}
+
+
+def route(state: State):
+    return &quot;simulate&quot; if state[&quot;approved&quot;] else &quot;decline&quot;
+
+
+def simulate(state: State):
+    return {&quot;outcome&quot;: &quot;approved_simulation_no_external_write&quot;}
+
+
+def decline(state: State):
+    return {&quot;outcome&quot;: &quot;declined&quot;}
+
+
+builder = StateGraph(State)
+builder.add_node(&quot;review&quot;, review)
+builder.add_node(&quot;simulate&quot;, simulate)
+builder.add_node(&quot;decline&quot;, decline)
+builder.add_edge(START, &quot;review&quot;)
+builder.add_conditional_edges(&quot;review&quot;, route)
+builder.add_edge(&quot;simulate&quot;, END)
+builder.add_edge(&quot;decline&quot;, END)
+
+graph = builder.compile(checkpointer=InMemorySaver())
+config = {&quot;configurable&quot;: {&quot;thread_id&quot;: &quot;local-demo&quot;}}
+graph.invoke({&quot;request&quot;: &quot;确认一份演示草案&quot;}, config=config)
+result = graph.invoke(Command(resume=True), config=config)
+assert result[&quot;outcome&quot;] == &quot;approved_simulation_no_external_write&quot;
+</code></pre>
+<p><code>InMemorySaver</code> 只适合这个进程内的演示，重启后数据会丢失。生产环境使用符合恢复要求的持久化后端，并将 thread 与实际用户、租户关联；知道一个 <code>thread_id</code> 不代表有权恢复该任务。恢复入口必须先检查身份与动作授权。</p>
+<h2 id="section-5">五、持久化不是断点续传的完整承诺</h2>
+<p>检查点让图能恢复，但恢复边界不是函数执行到哪一行就从哪一行继续。动态中断恢复可能从节点开头重新执行。把发邮件放在中断之前，就有重复发送的风险；放到之后也仍然存在“发送成功、节点记录失败”的窗口。<a href="https://docs.langchain.com/oss/python/langgraph/interrupts">中断恢复规则</a></p>
+<p>因此需要把可重放的计算与外部副作用分开，给后者稳定的操作编号和下游幂等契约。重放历史任务时，也应默认关闭真实写入。</p>
+<p>持久化模式同样有取舍。当前文档区分 <code>exit</code>、<code>async</code> 和 <code>sync</code>：分别偏向退出时保存、异步保存和同步保存。同步模式减少步骤间的状态丢失窗口，但不会把外部 API 纳入同一个事务，也不能消除首次受理前后的所有空档。<a href="https://docs.langchain.com/oss/python/langgraph/checkpointers">检查点与持久化模式</a></p>
+<p>并行更新状态时，还要显式考虑合并语义。同一字段由多个节点写入，应设计 reducer 或调整状态结构。消息有专门的消息合并方式；普通列表相加只会追加，也不等于按业务 ID 去重。<a href="https://docs.langchain.com/oss/python/langgraph/graph-api">Graph API 状态与 reducer</a></p>
+<p>条件路由也值得单独测。用 LangGraph 1.2.20 验证时，路由返回未知目标，无 <code>path_map</code> 的图会告警并忽略该分支，有显式映射且返回值不在映射中的图则会抛出 <code>KeyError</code>。分支静默结束时，调用方可能拿到中间状态并误当成完成。建议给合法分支、未知路由值和业务终态分别写断言，升级后用锁定的版本重跑。</p>
+<h2 id="section-6">六、按这些场景做初步选择</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>可以先尝试什么</th>
+<th>判断依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单次摘要、提取、分类</td>
+<td>直接 SDK 或简单函数流程</td>
+<td>没有必要维护 Agent 循环</td>
+</tr>
+<tr>
+<td>少量只读工具的对话助手</td>
+<td>LangChain 标准 Agent</td>
+<td>标准循环能覆盖主要行为</td>
+</tr>
+<tr>
+<td>固定检索后回答</td>
+<td>普通代码或 LangChain 组件</td>
+<td>先验证检索质量，不急着图编排</td>
+</tr>
+<tr>
+<td>多阶段申请、审批后恢复</td>
+<td>LangGraph 或已有工作流系统</td>
+<td>状态与恢复边界本身很重要</td>
+</tr>
+<tr>
+<td>动态分工的多执行单元</td>
+<td>显式编排，按需使用 LangGraph</td>
+<td>要控制分工、聚合、取消和共享状态</td>
+</tr>
+<tr>
+<td>已有可靠的业务工作流平台</td>
+<td>保留其生命周期管理，接入局部 Agent</td>
+<td>避免两套调度与重试共同拥有同一状态</td>
+</tr>
+</tbody>
+</table></div>
+<p>迁移的触发点可以是代码结构开始变得不清楚：很多布尔标志共同决定下一步，中间件里塞满跨阶段状态，恢复时不知道该跳到哪一个业务节点。这时显式图通常有价值。仅仅因为工具从三个增加到五个，并不自动构成迁移理由。</p>
+<h2 id="section-7">七、旧项目升级时，先检查接口和行为</h2>
+<p>LangGraph v1 迁移文档将 <code>langgraph.prebuilt.create_react_agent</code> 标记为弃用，推荐标准 Agent 使用 LangChain 的 <code>create_agent</code>。这不等于所有旧项目立即不可用，也不等于改一个 import 就完成迁移。<a href="https://docs.langchain.com/oss/python/migrate/langgraph-v1">v1 迁移指南</a></p>
+<p>升级前锁定当前依赖，记录模型与工具契约，收集未完成任务和检查点格式。新版本先验证工具错误、结构化输出、中断恢复、状态持久化和流式事件。已经等待审批的旧任务，可以继续使用旧版本运行时，或通过明确迁移恢复。</p>
+<p>不要把 Python 文档中的代码直接当成 JavaScript 的同名接口；两边理念相近，包名、类型和细节仍需要分别核对。也不要把最新文档描述的每一项能力都理解成所有历史 v1 小版本都支持，部署应锁定并验证具体版本。</p>
+<p>如果标准循环已经能稳定表达任务，就保留 LangChain 这一层；如果业务要求你直接控制状态转移，就向 LangGraph 下沉。最终需要维护的是一套可理解、可验证的执行过程，而不是某个框架名称。</p>
+<hr>
+<p>资料核对日期：2026 年 11 月 7 日。示例采用当日官方 Python 文档中的接口风格，模型示例需要单独配置供应商环境。本系列的整体选型方法见<a href="../agent-patterns/">七种工程模式</a>，外部动作的一致性处理见<a href="../enterprise-agent-architecture/">企业架构</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

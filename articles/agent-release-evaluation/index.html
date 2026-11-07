@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="把结果、工具轨迹和业务状态纳入评测，区分质量比较与发布门槛。">
+  <title>Agent 评测怎样进发布流程 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">Agent 运行与交付</p><h1>Agent 评测怎样进发布流程</h1><ul class="article-tags" aria-label="能力标签"><li>Agent 评测</li><li>发布治理</li><li>质量保障</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">用一个任务把验收条件写完整</a></li><li><a href="#section-2">裁判分数和硬门槛分开</a></li><li><a href="#section-3">先跑哪一批</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>一个报销助手给出了正确的余额，文字也很清楚。但它先尝试修改申请，再查余额。要是只给最后一句话打分，这条评测就可能通过。评测集应该写清楚用户要的结果，也要写清楚执行过程允许做什么。</p>
+<h2 id="section-1">用一个任务把验收条件写完整</h2>
+<p>拿“查询上个月那次申请的进度”举例。测试环境先准备两张申请，其中一张属于当前员工，另一张属于同部门的其他人。员工用含糊的说法提问时，先确认指的是哪一张。如果请求指向无权查看的申请，预期行为要与系统的权限策略一致。跑完后核对可见结果、实际读取的对象和业务表状态。</p>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>要测什么</th>
+<th>适合怎么判</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>访问和写入边界</td>
+<td>校验授权结果、调用记录和实际状态变化</td>
+</tr>
+<tr>
+<td>业务结论</td>
+<td>对照测试数据里的状态与适用规则</td>
+</tr>
+<tr>
+<td>引用是否支撑答案</td>
+<td>对照原文抽查，必要时用模型做初筛</td>
+</tr>
+<tr>
+<td>表达是否清楚</td>
+<td>具体评分标准加人工校准</td>
+</tr>
+</tbody>
+</table></div>
+<p>轨迹断言只限定必须发生或严禁发生的动作。只要两条读取路径遵守相同权限、返回相同证据，通常可以允许实现调整。审批和写入场景用隔离测试环境，测试对象可以重置，退款和外发通道用替身或沙箱。多准备一次超时、一次部分成功、一次重复回调，比让 mock 永远返回成功更接近真实使用。 <a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents">Anthropic Agent 评测实践</a></p>
+<h2 id="section-2">裁判分数和硬门槛分开</h2>
+<p>模型裁判适合初筛自然语言结果。我会把“回答好不好”拆开，让它逐项给出依据，比如日期用错在哪里、哪个结论缺证据。用人工样本检查裁判一致性。做成对比较时交换答案顺序，对不一致的样本再复核。更换裁判模型或评分规则后，用新配置重跑基线，旧分数保留作记录。</p>
+<p>越权读取、跳过审批和重复提交应单独阻断发布。回答完整度和表达质量则可以比较同一批样本的变化，必要时重复运行，报告波动范围。题库按常用场景、边界和长尾分组。留一部分题到发版时再看，避免每次改提示词都对着同一组答案调。</p>
+<h2 id="section-3">先跑哪一批</h2>
+<p>提交改动时跑确定性检查和小组回归，合并或发版前再跑受影响的场景与关键边界。灰度阶段看真实任务完成、人工接管和单次成功任务成本。样本少时继续观察，点踩率的变化也要结合版本和流量构成判断。</p>
+<p>线上坏例可以先把问题重建成可控测试数据，再放进评测集。保留触发失败所需的条件和证据即可。用户原始对话和工具响应有自己的访问与保留规则。</p>
+<p>需要设计灰度或止损条件时，可以接着看 <a href="../agent-pilot-rollout/">Agent 功能怎样试点和放量</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

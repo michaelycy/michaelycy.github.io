@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="门户、调试和回放共享会话逻辑，分别管理实时事件和实例状态。">
+  <title>一套 Chat SDK 怎样同时服务门户和调试窗口 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">项目实践</p><h1>一套 Chat SDK 怎样同时服务门户和调试窗口</h1><ul class="article-tags" aria-label="能力标签"><li>Chat SDK</li><li>实时通信</li><li>组件架构</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">给不同入口留出各自的空间</a></li><li><a href="#section-2">流式返回里不只有回答正文</a></li><li><a href="#section-3">把人工表单当成一次待处理的交互</a></li><li><a href="#section-4">最后看看卸载时还剩什么</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>一个智能体平台里，会出现好几个长得像聊天框的地方。门户里的人用它问问题，编辑器里的人用它看节点和工具调用，日志页面还要把一次历史对话重新放出来。如果它们各自处理消息、请求和重连，日后加一个人工确认表单，就要逐处想一遍该怎么接。</p>
+<p>我参与的企业级智能体平台有悬浮助手、门户会话、编辑器调试和日志回放。项目把会话逻辑收进 Chat SDK 的 Core，Vue 适配器负责界面接入，独立 Bundle 则用于嵌入。各入口共享会话能力，同时保留各自的展示和生命周期。</p>
+<h2 id="section-1">给不同入口留出各自的空间</h2>
+<p>门户会话更关心提问和回答。调试窗口还要能看工具执行、节点进度和中断。日志回放面对的是已保存的历史记录。它们可以共用消息和会话的基本结构，宿主再按场景传入参数，选择文件、图表、引用或人工交互等插件。</p>
+<p>插件本身也有先后关系。比如要展示一张动态表单，界面得先收到能关联当前会话的事件。项目用插件依赖、Hook 和中间件组织扩展。这样增加一种交互时，可以先检查它依赖什么状态、通过哪个入口接入，再决定哪些宿主需要它。</p>
+<p>同一页同时开着悬浮助手和调试窗口时，实例的边界就变得很具体。调试窗口关闭后，悬浮助手还应该继续工作。项目区分全局与局部实例，通过 Shadow DOM 管理嵌入样式，并按实例处理状态、语言、订阅和卸载。</p>
+<h2 id="section-2">流式返回里不只有回答正文</h2>
+<p>用户问了一个需要查知识的问题，界面可能先显示工具正在运行，再显示结果，最后才出现回答。另一次调用可能停在人工表单，等用户选择后才继续。把所有内容都接在同一段回答后面，很难知道哪部分该展示、哪部分该触发交互。</p>
+<p>平台把后端响应映射为 SSE 事件，前端分别处理正文、工具调用、节点进度、中断和终态。SSE 可以用事件类型区分不同消息，应用需要定义每种事件对应什么业务行为。 <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html">HTML 标准中的服务端事件流</a></p>
+<p>另一条链路是多实例同步。项目通过 WebSocket 事件、去重确认和快照恢复，让不同入口能重新对齐会话。下面是两种职责的示意。当前请求的增量输出供界面呈现，会话更新与快照用于实例之间的状态同步。</p>
+<p><a class="article-figure" href="../assets/13-chat-sdk-events.svg" title="查看原图"><img src="../assets/13-chat-sdk-events.svg" alt="会话界面分别接收流式事件与跨实例状态更新" loading="lazy"></a></p>
+<details>
+<summary>查看 Mermaid 源码</summary>
+<pre><code class="language-mermaid">flowchart TD
+    A[后端运行结果] --&gt; B[SSE 返回本次请求的增量事件]
+    A --&gt; C[WebSocket 同步会话变化]
+    B --&gt; D[正文 工具 节点与人工交互]
+    C --&gt; E[去重 确认与快照恢复]
+    D --&gt; F[Chat SDK 维护会话状态]
+    E --&gt; F
+    F --&gt; G[门户 悬浮助手与调试窗口]
+</code></pre>
+</details>
+<p>可以用一次断连想清楚两者的区别。界面收到的最后一段正文可能只有半句话，另一端的任务此时已经执行完。重新连接后，应先核对当前会话的结果和执行状态，再决定怎样显示。靠“刚才最后收到什么”来猜，容易把已经结束的对话一直显示成生成中。</p>
+<h2 id="section-3">把人工表单当成一次待处理的交互</h2>
+<p>工作流停下来等用户填表时，表单属于某次会话里的某个中断。关掉窗口再打开，用户需要看到这次交互是否还待处理。项目将人工中断与表单交互关联起来，并接入提交后的续执行。</p>
+<p>验收时可以分别试两个窗口。先在其中一个窗口提交，再到另一个窗口看待处理状态是否更新。然后试一次提交后断网，检查页面能否通过服务端状态判断提交结果。这里要验的是业务动作是否继续，以及其他实例怎样看到结果，单看发送请求有没有返回很容易漏掉中间状态。</p>
+<h2 id="section-4">最后看看卸载时还剩什么</h2>
+<p>嵌入式聊天最容易被忽略的步骤是关闭。弹窗从屏幕上消失以后，可能还有连接、事件监听或宿主页面里的节点。下一次打开时，旧实例也可能继续响应同一条更新。</p>
+<p>Bundle 和实例都有清理逻辑。验证时可以打开一个调试实例，触发一条流式回复，在回复期间关闭，再重新打开。观察旧实例的界面和订阅有没有清掉，同时看看另一个窗口能不能继续接消息。</p>
+<p>工作流设计器怎样保存配置和衔接发布，见<a href="../agent-workflow-publishing/">Agent 工作流画布的草稿保存与发布</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

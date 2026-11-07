@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="按任务汇总调用费用，处理并发额度预占、超时核对和降本评估。">
+  <title>Agent 调用成本怎样记账和限额 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">Agent 运行与交付</p><h1>Agent 调用成本怎样记账和限额</h1><ul class="article-tags" aria-label="能力标签"><li>成本控制</li><li>并发控制</li><li>模型调用</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">把消耗记到一次任务上</a></li><li><a href="#section-2">限额要在调用前生效</a></li><li><a href="#section-3">降本改动按相同任务比较</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>用户只发了一句“帮我核对这份申请”，后台可能要做意图判断、查两次制度、调用工具，再生成答复。中间还有超时和重试。月底看到总费用涨了，如果只有一张模型调用量的图，很难判断应该先改哪里。</p>
+<h2 id="section-1">把消耗记到一次任务上</h2>
+<p>每次计量记录关联租户、任务、调用和计价配置。模型输入、输出和可区分的缓存用量分别记，向量化、重排等按实际计费方式另记。评测、后台提炼、影子流量单独标记，免得拿这些费用和在线任务成功数一起算。</p>
+<p>用量记录独立于调试 trace 的采样。聚合时可以查一次任务用了几步、失败和重试花了多少。供应商超时后没返回用量，先记待核对，后续用可获得的用量记录或账单对账。价格变化时保留适用的计价版本，避免拿今天的单价回算上个月。</p>
+<h2 id="section-2">限额要在调用前生效</h2>
+<p>假设一个租户还剩一小段预算，此时有三个请求同时进来。三个 worker 都先读到“余额够”，等跑完才扣，就可能一起超过上限。比较稳的做法是请求前按可控的上限原子预占，结束后按实际用量结算。同一次调用的结算消息重复投递时按编号去重。重试如果真的发出了新调用，就作为另一次消耗单独计量。预占也需要超时回收和对账机制，不能在调用结果未知时把额度直接当作可用。</p>
+<p>额度策略可以分任务、用户和租户。任务侧限制步数、时长和输出，租户侧限制同时运行量与预算。能否对供应商账单作硬上限承诺，取决于实际计费项、是否能限制最大消耗、在途调用是否可取消，以及外部账单能否及时核对。降级到经过验证的模型、暂停新请求和停止当前循环，是三种影响不同的处理方式，页面应给出对应状态。</p>
+<h2 id="section-3">降本改动按相同任务比较</h2>
+<p>如果费用主要来自每轮重复携带长文档，可以先调整 <a href="../agent-context-assembly/">上下文组装</a>。如果集中在简单分类，再试更轻的模型，重点看低置信度分支和错分带来的返工。离线任务能否用批处理，则取决于供应商能力和交付时限。涉及写操作的工作流，也要把重试后的人工核对算进去。</p>
+<p>回答缓存要同时考虑当前权限、来源版本和业务时间。两个请求的文字完全一样，只要适用制度或可见范围不同，就需要分别处理。判断降本是否成功时，用同一批任务比较质量、完成率、等待时间和每次成功的实际成本。单次调用便宜了，但整体重试更多时，节省的费用可能都花在了返工上。 <a href="../knowledge-base-integration/">知识库权限与缓存</a></p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="从一次拖动看 PDF、OCR 和编辑器的坐标如何对齐，修改怎样写回译文。">
+  <title>PDF 译文校准的坐标转换与回写 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">项目实践</p><h1>PDF 译文校准的坐标转换与回写</h1><ul class="article-tags" aria-label="能力标签"><li>PDF 编辑</li><li>坐标变换</li><li>长文档渲染</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">先把位置换回文档页坐标</a></li><li><a href="#section-2">拖位置、改尺寸和改文字，要能叠加</a></li><li><a href="#section-3">长文档只画用户正在看的部分</a></li><li><a href="#section-4">预览对齐以后，再打开生成的文件看一次</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>比如把译文里的一行字往右拖一点。当前预览看着正好，缩放以后却偏了，下载打开又偏了另一截。查这种偏移，可以先看拖动后保存的位置以窗口还是文档页为基准。</p>
+<p>我参与过文档翻译平台的双栏对比和译文校准。界面支持改文字块的位置和样式，调整之后还能重新生成。这里比普通拖拽多了几层坐标，尤其是扫描件做过回正，或者 PDF 页只渲染了一部分的时候。</p>
+<h2 id="section-1">先把位置换回文档页坐标</h2>
+<p>在浏览器里拖动时，事件坐标来自视口。图像识别框可能来自 OCR 处理过的图片，PDF 本身又有页坐标。再考虑页面缩放、旋转和滚动，直接拿其中一组数字去覆盖另一组，预览和导出就会分开走。</p>
+<p>先看最简单的例子。页面预览放大为两倍，坐标轴方向一致，文字块向右拖了 20 个 CSS 像素，换回原始页面坐标只移动了 10 个单位。这个例子只有缩放。真实页面如果旋转过，屏幕上的向右可能对应页坐标的另一个方向，单独除以比例就不够了。</p>
+<p>项目用仿射矩阵与逆变换转换几何数据。渲染时从页面几何映射到显示位置，编辑时再把交互结果映射回去。PDF.js 的渲染示例也区分了页面 viewport 的变换和高分屏上的 Canvas 输出比例。前者管页面怎么放，后者管用多少物理像素画出来。 <a href="https://mozilla.github.io/pdf.js/examples/">PDF.js 页面渲染示例</a></p>
+<p><a class="article-figure" href="../assets/11-document-coordinate-mapping.svg" title="查看原图"><img src="../assets/11-document-coordinate-mapping.svg" alt="从文档坐标渲染到编辑视图并将交互位置逆变换回文档" loading="lazy"></a></p>
+<details>
+<summary>查看 Mermaid 源码</summary>
+<pre><code class="language-mermaid">flowchart TD
+    A[文字块的文档页坐标] --&gt;|正向变换| B[编辑器中的显示位置]
+    B --&gt; C[用户拖动或缩放文字块]
+    C --&gt;|逆变换| D[更新文档页坐标]
+    D --&gt; E[重新预览与生成译文]
+</code></pre>
+</details>
+<p>真正落数据时还要说清楚“这个矩阵从哪到哪”。比如 OCR 在回正后的图片上跑，框的位置就以回正后的图为准。用它去更新原页前，要把回正这步算进去。预览如果只渲染页的一部分，渲染区域的偏移也要放在正确的那一层。</p>
+<p>回正的图片还有一个细节。把一个矩形转回原图坐标，再取一个能包住四个角的水平矩形，框可能变大。下一次打开时如果又从这个外接框计算回正位置，预览框会再次变化。项目在重画时优先使用已保存的回正预览框，原始像素框仍交给原来的保存接口。两种位置各有用途，重复打开时也能保持编辑框稳定。</p>
+<h2 id="section-2">拖位置、改尺寸和改文字，要能叠加</h2>
+<p>用户很少只做一种编辑。可能先改翻译用词，再缩小字号，最后把框移开一点。保存位置时顺手拿最早的整块数据回写，就可能把前两次修改盖掉。</p>
+<p>项目在校准链路里合并已有编辑、样式和位置变化。拿一块文字来说，内容、样式和几何是三类改动。能明确这次交互碰了哪个字段，保存以后也更好查为什么变了。再次打开编辑器时，用合并后的页坐标和样式重新算显示位置，换缩放比例也能继续编辑。</p>
+<p>还要留意译文的长度。位置算对了，原来一行的文字翻完也可能变成三行。校准里要看文字框是否装得下、有没有挡住邻近内容、换行和字号是否合适。几何校验和版面检查可以分别做，出了偏移先看坐标，出了溢出再看排版。</p>
+<h2 id="section-3">长文档只画用户正在看的部分</h2>
+<p>双栏对照同时放原文和译文。文件一长，两边都把所有页面画成 Canvas，很快就会积累一批屏幕外的画布和图像资源。</p>
+<p>项目采用页面窗口化渲染，按需读取资源，也会释放离屏 Canvas。这里我更关心编辑状态的归属。用户刚调整完一块文字，滚走又滚回来，重新挂载的页面应该按现有编辑数据画出来。Canvas 可以重建，文字块位置和样式需要留在文档编辑状态里。</p>
+<p>缩放后的点击和缩放过程中的拖动可以分开测。前者主要看映射是否正确，后者还要确认一次操作前后用的是同一套坐标基准。如果拖拽期间页面尺寸变了，就要检查起点和终点的变换是否还能直接比较。</p>
+<h2 id="section-4">预览对齐以后，再打开生成的文件看一次</h2>
+<p>工作台上位置正确，只能确认预览这条链路。最终还要把校准结果交给生成环节。平台支持覆盖更新和另存，用户可以按自己的操作选择结果去向。</p>
+<p>验收回写时，可以先选普通页，在不同缩放下移动同一个块，检查保存前后的页位置。再选旋转页和回正后的扫描页，检查正反变换和图片偏移。最后下载生成文件，重新打开有修改的页面，看文字、位置和版面是否一起带过去。</p>
+<p>任务执行和重新生成的上下文见<a href="../document-translation-recovery/">文档翻译任务怎样在刷新和失败后继续</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

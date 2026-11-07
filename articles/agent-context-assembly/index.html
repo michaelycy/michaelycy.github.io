@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="以差旅制度问答为例，处理历史日期、撤权和输入预算。">
+  <title>Agent 这一轮该带哪些上下文 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">记忆与知识检索</p><h1>Agent 这一轮该带哪些上下文</h1><ul class="article-tags" aria-label="能力标签"><li>上下文管理</li><li>状态管理</li><li>权限控制</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">先分清哪些内容需要刷新</a></li><li><a href="#section-2">放不下时，先裁哪里</a></li><li><a href="#section-3">组装也要单独验收</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>员工先问“上海住宿能报多少”，后来补了一句“我是上个月去的”。这时应该重新按出行日期查制度。即使上一轮的答案说得很清楚，把它连同几页现行制度一起传给模型，也容易让模型沿用原来的结论。</p>
+<p>我倾向于把上下文组装做成单独一步。每次调用前都能回答三个问题：本轮要完成什么，哪些信息有权使用，放不下时先舍掉什么。</p>
+<h2 id="section-1">先分清哪些内容需要刷新</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>内容</th>
+<th>这一轮怎么取</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>任务字段</td>
+<td>从状态读取已确认的地点、日期和待补信息</td>
+</tr>
+<tr>
+<td>身份与权限</td>
+<td>由服务端按当前调用者和资源校验，模型只收到完成任务所需的字段</td>
+</tr>
+<tr>
+<td>知识片段</td>
+<td>按问题与适用日期检索，带回来源和版本</td>
+</tr>
+<tr>
+<td>历史与偏好</td>
+<td>保留理解指代所需的消息，其他内容按需读取</td>
+</tr>
+<tr>
+<td>工具定义</td>
+<td>按当前阶段和权限提供，执行前仍要鉴权</td>
+</tr>
+</tbody>
+</table></div>
+<p>会话摘要可以保留“用户问过差旅报销”。具体是哪次出差、用户后来更正了什么，应留在可追溯的任务字段里。下一轮发现日期改了，就重新查证据。旧的摘要即使还留着，也不能替代重新查询。</p>
+<h2 id="section-2">放不下时，先裁哪里</h2>
+<p>先按实际接口计算输入预算，并给输出留空间。工具定义、历史消息和工具返回都会占用输入，图片的计量还取决于供应商和请求配置。可以先去掉重复证据，裁剪无关字段，再压缩较早的历史。裁剪证据时，保留结论所依赖的适用条件和原文引用。工具调用消息和返回消息要成对处理，避免裁完之后请求结构不合法。</p>
+<p>如果一条制度的限制条件在另一页，单独留下结论段会改变原意。碰到这类问题，我会优先保留相邻证据，或者改成按页取需要的内容。关键证据仍放不下时，可以缩小查询范围或让用户补充条件。把半截证据塞进窗口再让模型猜，后面很难补救。</p>
+<p>有些接口支持前缀缓存，可以把相对稳定的说明放前面。具体能否命中取决于供应商规则和输入是否满足条件，应用仍应组装本轮所需的消息。若复用历史摘要或检索缓存，还要处理改口、撤权和资料更新。 <a href="https://www.anthropic.com/research/effective-context-engineering-for-ai-agents">Anthropic 上下文工程说明</a></p>
+<h2 id="section-3">组装也要单独验收</h2>
+<p>我会拿同一个任务做三次小改动。先把日期改成历史日期，再撤掉一个来源的访问权，最后把工具结果换成超长数据。逐次检查实际请求，确认旧证据没有混回来，必要字段没有被截断，访问受限的片段没有进入模型。这样能先判断问题出在组装还是生成。</p>
+<p>进一步阅读 <a href="../agent-memory/">Agent 记忆系统</a> 和 <a href="../semantic-retrieval/">语义检索链路</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

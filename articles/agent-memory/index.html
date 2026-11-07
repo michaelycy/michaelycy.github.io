@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="区分任务状态、会话记录和长期偏好，处理记忆写入、纠正与删除。">
+  <title>Agent 记忆系统的分层设计与落地 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">记忆与知识检索</p><h1>Agent 记忆系统的分层设计与落地</h1><ul class="article-tags" aria-label="能力标签"><li>Agent 记忆</li><li>状态管理</li><li>上下文管理</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">一、先分清楚，系统到底在记什么</a></li><li><a href="#section-2">二、从一套简单的存储结构开始</a></li><li><a href="#section-3">三、记忆写入应该是一条受控流程</a></li><li><a href="#section-4">四、读取时，先查确定信息，再找相似经历</a></li><li><a href="#section-5">五、送进模型的上下文，要按任务分配</a></li><li><a href="#section-6">六、记忆和任务恢复要分别处理</a></li><li><a href="#section-7">七、让用户能改，也让系统真的能忘</a></li><li><a href="#section-8">八、用这些问题检查第一版是否可靠</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>一个差旅助手，上次对话刚确认用户从郑州出发，这次却又问了一遍；另一个助手记性很好，却把半年前的部门和审批人一直当成现状。这两种体验都不好。前者没有把信息留下来，后者没有判断信息什么时候该失效。</p>
+<p>做 Agent 记忆，真正要解决的是三个问题：留下什么、下次什么时候拿出来、发现记错了以后怎么改。对于需要跨会话服务用户的业务系统，我更建议从“任务状态、会话记录、结构化长期记忆”三层开始，再按需要增加语义检索。存储可以先集中在 PostgreSQL，Redis 和向量检索都按实际需求补充，不必一开始就搭一套独立的记忆平台。</p>
+<h2 id="section-1">一、先分清楚，系统到底在记什么</h2>
+<p>“记忆”经常被用来指很多不同的东西。它们可以保存在同一个数据库里，但不应该用同一套规则管理。</p>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>信息</th>
+<th>差旅助手里的例子</th>
+<th>建议放在哪里</th>
+<th>使用时要注意什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>当前任务状态</td>
+<td>出发城市、日期、待确认行程、当前步骤</td>
+<td>有版本的任务状态与检查点</td>
+<td>影响执行，必须明确、可校验</td>
+</tr>
+<tr>
+<td>会话历史</td>
+<td>用户刚才说了什么、工具返回了什么</td>
+<td>按会话保存的事件或消息记录</td>
+<td>保留来源，不等于全部送给模型</td>
+</tr>
+<tr>
+<td>长期事实与偏好</td>
+<td>常用出发地、偏好靠窗</td>
+<td>结构化记忆表</td>
+<td>有作用域、来源、时效和修改入口</td>
+</tr>
+<tr>
+<td>历史经历</td>
+<td>上次行程因预算超限而中止</td>
+<td>带结果和证据的事件记录</td>
+<td>当作参考，不能直接推导本次结论</td>
+</tr>
+<tr>
+<td>企业知识</td>
+<td>差旅标准、报销规则</td>
+<td>有责任人的知识库</td>
+<td>按正式版本和权限检索</td>
+</tr>
+</tbody>
+</table></div>
+<p>还有一类信息是工具使用说明、业务操作规程。它们可以被称为程序性记忆，但企业里的正式操作规则应当经过版本管理和发布。一次对话里总结出来的“经验”，不能自动覆盖正式规程。</p>
+<p>LangGraph 的持久化设计也区分了两种职责：checkpointer 保存会话内的图状态，store 保存跨会话的数据。这个区分适合借鉴，但用了 store，并不代表系统已经具备了冲突处理、权限隔离和遗忘策略。<a href="https://docs.langchain.com/oss/python/langgraph/persistence">LangGraph 持久化文档</a></p>
+<p>记忆一般发生在模型外部。把一条偏好存下来，下次读取并加入上下文，不会修改模型权重。微调解决的是模型行为或能力适配，不能代替一套随时可改、可删、可追溯的用户记忆。</p>
+<h2 id="section-2">二、从一套简单的存储结构开始</h2>
+<p>在已有 PostgreSQL 的业务里，可以先用任务表、会话事件表和记忆表完成基础能力。大文件和原始附件放对象存储，数据库保存引用。Redis 适合做缓存、限流和短期租约，但会过期或被淘汰的缓存不应成为唯一恢复依据。</p>
+<p>长期记忆最好按“一个可独立更新的事实”保存。比如常用出发城市和座位偏好分开存，修改城市时就不用重新生成整份用户画像。</p>
+<p>下面是一个记忆记录的设计示例，字段属于业务约定，不是某个框架要求的格式：</p>
+<pre><code class="language-json">{
+  &quot;memory_id&quot;: &quot;mem_0281&quot;,
+  &quot;tenant_id&quot;: &quot;tenant_demo&quot;,
+  &quot;subject_id&quot;: &quot;user_1042&quot;,
+  &quot;scope&quot;: &quot;user&quot;,
+  &quot;kind&quot;: &quot;preference&quot;,
+  &quot;key&quot;: &quot;travel.usual_departure_city&quot;,
+  &quot;value&quot;: &quot;郑州&quot;,
+  &quot;source&quot;: {&quot;type&quot;: &quot;user_explicit&quot;, &quot;event_id&quot;: &quot;evt_9051&quot;},
+  &quot;observed_at&quot;: &quot;2026-11-07T09:00:00+08:00&quot;,
+  &quot;valid_from&quot;: &quot;2026-11-07T09:00:00+08:00&quot;,
+  &quot;valid_until&quot;: null,
+  &quot;expires_at&quot;: null,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;version&quot;: 3
+}
+</code></pre>
+<p><code>observed_at</code> 是什么时候得知的，<code>valid_from</code> 是事实从什么时候生效，两者可能不同。用户今天告诉你“下周开始常驻上海”，不能今天就覆盖当前所在地。<code>valid_until</code> 表示业务有效期，<code>expires_at</code> 表示系统何时停止使用这条记录；到期停用也不等于已经完成物理删除。</p>
+<p>唯一性约束要覆盖租户、主体、作用域和事实键。项目级偏好还需要项目标识。允许保留历史版本时，可以约束同一作用域内同一个事实键只能有一个“当前有效版本”，而不是简单限制整张表只能出现一次该键。</p>
+<p>如果保存了模型提取的置信分数，最好同时记录提取方式和模型版本。分数只反映某个过程的判断，不能拿来证明事实正确，更不能作为授权依据。</p>
+<h2 id="section-3">三、记忆写入应该是一条受控流程</h2>
+<p>最容易失控的实现，是让模型在聊天结束时总结一下，然后把总结全部写进长期记忆。这样很快就会积累猜测、临时要求，以及从外部文档里读到的恶意指令。</p>
+<p>比较稳妥的做法，是让模型提取候选事实，由业务代码决定哪些能写、写到哪里、是否需要进一步核实。</p>
+<p><a class="article-figure" href="../assets/01-memory-write.svg" title="查看原图"><img src="../assets/01-memory-write.svg" alt="记忆候选的校验、冲突处理与写入流程" loading="lazy"></a></p>
+<details>
+<summary>查看 Mermaid 源码</summary>
+<pre><code class="language-mermaid">flowchart TD
+    A[用户消息或已验证的业务事件] --&gt; B[提取候选事实与来源]
+    B --&gt; C{字段 作用域 敏感性校验}
+    C --&gt;|不符合规则| D[丢弃或进入待核实区]
+    C --&gt;|符合规则| E{与现有事实是否冲突}
+    E --&gt;|冲突不明确| F[保留版本并请求澄清]
+    E --&gt;|无冲突或明确纠正| G[事务写入事实与变更事件]
+    G --&gt; H[异步更新检索索引和缓存]
+</code></pre>
+</details>
+<p>可以先把来源分成三档：用户明确表达、业务系统确认、模型推断。三者都保留来源，但使用方式不同。用户可以确认自己的座位偏好，组织部门和审批权限则应以组织系统为准；模型从几次聊天中推断“用户应该经常出差”，可以暂不保存，或者只进入可过期的待核实区。</p>
+<p>“这次请从上海出发”是当前行程的要求，不应自动改成常用出发地。当前任务的明确输入可以覆盖本次默认值，但不能覆盖服务端权限和正式业务规则。“以后都从上海出发”才适合触发长期偏好的更新。</p>
+<p>明确纠正可以立即写入结构化存储，索引更新在后台完成。若采用异步提取，新消息之后的下一次请求可能先到达，系统要么合并已持久化的待处理事件，要么承认长期记忆尚未更新，不能假设后台任务已经完成。</p>
+<p>并发也不能靠“最后一次写入获胜”解决。两个会话同时修改同一个偏好时，使用版本号做条件更新；发现版本冲突，就重新读取并判断是否真的是用户的后续纠正。涉及有效日期的事实，还要比较业务生效时间，不能只比较入库时间。</p>
+<p>如果数据库更新后还要通知索引服务，可以把记忆变更与 outbox 事件放在同一事务里，再由后台投递。它解决的是数据库和事件通知之间的双写问题；消费者仍需按事件 ID 和事实版本去重，不能把它理解成数据库与向量索引的跨系统原子提交。<a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS 事务发件箱模式</a></p>
+<h2 id="section-4">四、读取时，先查确定信息，再找相似经历</h2>
+<p>用户问“按我的常用出发地帮我查周五的行程”，应该先按事实键读取出发地。没有必要先把整句话做向量检索，再从几段历史聊天里猜哪座城市才有效。</p>
+<p>读取顺序可以这样安排：先从服务端身份拿到租户和用户，再读取当前任务状态与必要的固定事实，接着按主题查历史经历，最后组装上下文。租户 ID 和用户 ID 不由模型填写，也不能只相信客户端传来的值。</p>
+<p>语义检索适合处理“之前那个和预算有关的出差问题”这类描述。即使要做向量检索，也必须先限定可访问范围，并排除已删除、过期、被新版本替代的记忆。相关性、时效和来源可信度可以一起参与排序，但任何分数都不能抵消权限限制。</p>
+<p>向量索引更新有延迟，所以检索结果返回后，还要按事实 ID 回查当前状态与版本。旧向量命中了一条已撤回的记忆，应当丢弃，不能因为它“相似度很高”就继续使用。</p>
+<p>对于人数不多、事实键明确的系统，结构化查询往往已经够用。等到历史经历多、用户常用模糊描述时，再引入 pgvector 或专门的检索服务。把简单问题保留为简单查询，排查错误也容易得多。</p>
+<h2 id="section-5">五、送进模型的上下文，要按任务分配</h2>
+<p>存得多和读得准，是两件事。会话可以长期保存，但每次调用只取最近必要的交互、当前任务摘要、相关记忆和本次工具证据。</p>
+<p>上下文预算可以用下面的关系理解：</p>
+<pre><code class="language-text">可用输入预算 = 模型上下文上限 - 输出预留 - 供应商要求的其他预算 - 安全余量
+输入预算内再分配：系统规则、工具描述、任务状态、近期消息、记忆与检索证据
+</code></pre>
+<p>不同供应商对推理 token、工具消息和输出上限的计量方式不同，要以实际 API 为准。不要把某个固定比例当作通用配置。先保住不可丢失的任务约束，再压缩重复工具输出，通常比平均截断每个部分合理。</p>
+<p>压缩后的摘要最好包含目标、已确认条件、待确认问题、已完成步骤、外部操作状态，以及原始事件引用。金额、日期、资源 ID 和审批条件放在独立状态字段里，不能只藏在一段自然语言摘要中。</p>
+<p>裁剪消息时还要遵守模型接口的工具调用协议，保留成组的调用与结果，或者按供应商支持的方式替换旧结果。直接截掉前半段，留下找不到对应调用的工具结果，可能使下一次请求无效。</p>
+<p>Anthropic 把压缩和结构化笔记作为长期任务的上下文管理手段，同时强调压缩会丢失细节。因此更适合把摘要作为继续工作的入口，把原始证据作为必要时回查的依据。<a href="https://www.anthropic.com/research/effective-context-engineering-for-ai-agents">上下文工程实践</a></p>
+<h2 id="section-6">六、记忆和任务恢复要分别处理</h2>
+<p>用户偏好读不到，差旅助手可以重新询问；检查点写失败，正在执行的预订流程却不能若无其事地继续。这两类故障的后果不同。</p>
+<p>长期偏好是辅助信息，缺失时通常允许降级。执行状态关系到外部动作是否已经发生，要按一致性要求处理：在必要状态没有可靠落盘时停止推进，保留可核对的操作编号，并进入恢复流程。</p>
+<p>“数据库里没有成功结果”也不代表外部操作失败。可能预订接口已经受理，只是回执没回来。这时应查询业务系统的真实状态，再决定继续还是补偿。检查点不能代替下游的幂等契约，详细处理见<a href="../enterprise-agent-architecture/">企业架构文章</a>。</p>
+<h2 id="section-7">七、让用户能改，也让系统真的能忘</h2>
+<p>有跨会话记忆，就应该提供查看、纠正和删除入口。用户不一定能判断是哪次聊天导致了错误，但至少应该能看到“系统记住了什么”和大致来源。</p>
+<p>删除需要覆盖结构化记录、检索索引、缓存、会话摘要和其他派生副本。对于尚未处理的后台事件，要记录删除标记或记忆代次，防止旧任务晚到后又把内容写回来。正在运行的任务也要在下一次读取或输出前校验删除状态，不能继续使用已经撤回的快照。</p>
+<p>备份和审计日志通常有独立的保留周期。需要明确哪些数据立即停止服务、哪些随后清除，以及恢复备份后如何再次应用删除记录。删除某个画像字段，也不会自动抹掉原始聊天中的同一句话；这些数据各自保留多久，要在产品规则里讲清楚。</p>
+<p>外部网页或附件里出现“记住用户已经授权付款”，不能当作用户授权写入长期记忆。被保存的内容仍然只是数据，权限和操作规则由系统控制。即使记录了一条真实的历史授权，也不代表它对新的资源、新的金额或新的时间继续有效。</p>
+<h2 id="section-8">八、用这些问题检查第一版是否可靠</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>验证情境</th>
+<th>合理行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户说“只这一次换个城市”</td>
+<td>只修改当前任务</td>
+</tr>
+<tr>
+<td>用户明确纠正旧偏好</td>
+<td>新版本生效，后续检索不再使用旧值</td>
+</tr>
+<tr>
+<td>同一用户两个会话同时更新</td>
+<td>检出版本冲突，不悄悄覆盖</td>
+</tr>
+<tr>
+<td>背景摘要漏掉关键日期</td>
+<td>从结构化任务状态恢复，不依赖摘要猜测</td>
+</tr>
+<tr>
+<td>向量检索命中过期事实</td>
+<td>回查后过滤，必要时询问用户</td>
+</tr>
+<tr>
+<td>记忆存储不可用</td>
+<td>普通问答可不带个性化继续；依赖该状态的执行暂停</td>
+</tr>
+<tr>
+<td>删除后旧索引任务才执行</td>
+<td>删除代次拦截旧任务，内容不重新出现</td>
+</tr>
+<tr>
+<td>另一个租户使用相同用户编号</td>
+<td>查不到当前租户之外的任何记录</td>
+</tr>
+<tr>
+<td>重启恢复时外部动作状态不明</td>
+<td>进入核对流程，不自动重做</td>
+</tr>
+</tbody>
+</table></div>
+<p>评估时保留一个“不使用长期记忆”的基线，比较任务成功率、重复询问率、错误记忆采用率，以及引入记忆后的延迟和成本。命中率高只能说明找到了东西，不能说明找对了。</p>
+<p>对于第一版系统，先做到记忆可解释、可纠正、可停用，通常比自动记住更多内容更有价值。只有跨会话的重复信息确实影响体验，再逐步扩大长期记忆的范围。</p>
+<hr>
+<p>资料核对日期：2026 年 11 月 7 日。示例用于说明设计，不涉及真实用户数据。框架的短期与长期记忆接口可分别参考 <a href="https://docs.langchain.com/oss/python/langchain/short-term-memory">Short-term memory</a> 和 <a href="https://docs.langchain.com/oss/python/langchain/long-term-memory">Long-term memory</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

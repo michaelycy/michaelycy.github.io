@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="从一次提交超时出发，追踪任务状态并验证复跑是否会重复写入。">
+  <title>Agent 故障怎样定位和安全复跑 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">Agent 运行与交付</p><h1>Agent 故障怎样定位和安全复跑</h1><ul class="article-tags" aria-label="能力标签"><li>可观测性</li><li>故障恢复</li><li>幂等</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">先从一条任务定位到具体步骤</a></li><li><a href="#section-2">把查看和复跑分开</a></li><li><a href="#section-3">用一次提交超时验收</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>用户说：“申请提交以后一直转圈，能再点一次吗？”我会先找任务编号和操作编号，看系统当时有没有收到提交结果。如果外部系统其实已经受理，再点一次可能会多出一笔申请。这一类故障，聊天记录通常只告诉你用户当时看到了什么。</p>
+<h2 id="section-1">先从一条任务定位到具体步骤</h2>
+<p>一条任务可以串起受理、模型调用、检索、工具执行和交付。异步步骤通过队列消息带上关联信息，重新领取任务时继续沿用业务任务编号，每次运行留自己的执行记录。服务重启、审批隔天回调时，照样能找到原来的操作。</p>
+<p>我会默认记录步骤状态、耗时、错误类型、模型与规则版本、证据 ID、工具名及脱敏参数摘要。排查检索时能看到用的是哪个索引版本，查写入时能知道需要到哪个业务系统核对。访问日志有独立权限和保留期。需要查看少量正文时再单独开启采集，限定任务范围和时长，并在入库前去掉密钥和多余的敏感字段。</p>
+<p>业务审计和调试 trace 也可以分开。前者回答谁在什么时候批准并提交了什么，后者帮工程团队找故障。调试数据允许按规则采样，关键审计和用量记录按各自需要可靠写入。采集掉线时，监控里要能看到丢失或积压。</p>
+<h2 id="section-2">把查看和复跑分开</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>排查方式</th>
+<th>适合什么情况</th>
+<th>工具怎么处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>看历史记录</td>
+<td>确认当时的调用顺序和已知结果</td>
+<td>只读历史</td>
+</tr>
+<tr>
+<td>用录制结果复跑</td>
+<td>检查组装、路由或生成变化</td>
+<td>回填已脱敏的检索和工具结果</td>
+</tr>
+<tr>
+<td>隔离环境重跑</td>
+<td>检查新版依赖和异常处理</td>
+<td>使用测试账号、测试数据和受控的写入替身</td>
+</tr>
+</tbody>
+</table></div>
+<p>某些框架也能从检查点恢复旧任务。这类功能会执行检查点之后的节点，模型调用、外部请求和中断都可能再次发生。调试入口应独立配置工具权限，默认关闭真实写入。生产任务恢复则沿用原来的操作编号，查清远端结果后再推进状态。 <a href="https://docs.langchain.com/oss/python/langgraph/checkpointers#replay">LangGraph 检查点与回放</a></p>
+<p>复跑成功一次，也只能说明这次走通了。线上数据可能已经变了，模型和配置也可能有差别。先把模型输入、索引版本、规则和工具结果逐项对齐，再判断问题是否只在某些输入或多轮执行时出现。</p>
+<h2 id="section-3">用一次提交超时验收</h2>
+<p>让测试系统接收申请并落库，然后故意延迟返回，超过工具调用时限。检查任务是否显示“结果待核对”，能否用同一个操作编号查到已提交结果，以及排错复跑会不会生成第二笔申请。最后检查普通日志里是否只留下排查所需的字段。</p>
+<p>关于操作记录和恢复状态，可以接着看 <a href="../enterprise-agent-architecture/">企业级 Agent 系统的架构与运行治理</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

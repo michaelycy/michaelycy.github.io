@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="连线、改参数和发布连着发生时，怎样保存草稿并核对发布版本。">
+  <title>Agent 工作流画布的草稿保存与发布 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">项目实践</p><h1>Agent 工作流画布的草稿保存与发布</h1><ul class="article-tags" aria-label="能力标签"><li>可视化工作流</li><li>状态管理</li><li>版本发布</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">先管住保存的顺序</a></li><li><a href="#section-2">能接上一条线，还要看它能带来哪些变量</a></li><li><a href="#section-3">让编辑者看得懂这次改了什么</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>在画布上改完一条连线，再去右侧面板换一个变量，紧接着点发布。对用户来说，这是一口气做完的三件事。对程序来说，前两次保存和最后一次发布分别走接口，返回顺序未必和点击顺序一样。</p>
+<p>我在企业级智能体与知识库平台参与了工作流画布和运行调试相关的全栈开发。画布和节点面板都会改变流程配置。项目里，两边保存时可能提交整份配置。连续操作时，后发的请求要是先落库，旧请求就有机会把较新的改动盖回去。</p>
+<h2 id="section-1">先管住保存的顺序</h2>
+<p>举个例子。画布先删掉一条边，得到草稿 A。随后右侧面板改了一个参数，得到草稿 B。B 的内容应该包含刚删边的结果。假如 A 和 B 并行保存，B 已经写入，A 晚一点才到，草稿就可能退回 A，参数修改也跟着丢了。</p>
+<p>项目把画布和配置修改放进同一条串行保存队列。同一时间推进一次保存，等待期间有连续编辑，就合并成后续要写入的草稿。编辑动作还是可以连着做，提交顺序则由队列管理。</p>
+<p>这里有两个时点要分清。编辑器显示了最新内容，说明本地状态已经更新。保存请求完成以后，服务端才有可供发布的草稿。点发布时需要等前面的保存和排队改动落库，再发发布请求。下面用 A、B 两份草稿示意这个过程。</p>
+<p><a class="article-figure" href="../assets/12-workflow-publish.svg" title="查看原图"><img src="../assets/12-workflow-publish.svg" alt="连续编辑时草稿按顺序保存，发布等待最新草稿落库" loading="lazy"></a></p>
+<details>
+<summary>查看 Mermaid 源码</summary>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant E as 工作流编辑器
+    participant S as 草稿服务
+    participant P as 发布服务
+    E-&gt;&gt;S: 保存草稿 A
+    E-&gt;&gt;E: 继续编辑得到草稿 B
+    E-&gt;&gt;E: 点击发布 等待保存
+    S--&gt;&gt;E: 草稿 A 已保存
+    E-&gt;&gt;S: 保存草稿 B
+    S--&gt;&gt;E: 草稿 B 已保存
+    E-&gt;&gt;P: 提交发布请求
+</code></pre>
+</details>
+<p>等保存这一步在正常网络里可能很短，验收时可以故意把接口响应放慢。趁 A 还没返回，修改一次配置，马上发布，查看发布请求是否等到 B 保存完成。再把 B 的保存请求改成失败，检查界面能否说明哪一份草稿还没保存，避免继续发布旧内容。</p>
+<p>串行队列管的是同一个编辑器里的提交顺序。两个标签页或两位编辑者各自修改时，要另外考虑服务端的版本冲突。单标签的慢请求验收和多标签的冲突验收，适合分开做。</p>
+<h2 id="section-2">能接上一条线，还要看它能带来哪些变量</h2>
+<p>画布上的边会影响节点依赖，也会影响下游节点能引用什么。比如知识检索节点输出一组文档，下游模型节点可以从可见的上游结果里选文档字段。删掉一条上游边后，之前选中的字段可能就不在当前路径上了。</p>
+<p>项目按上游依赖和父子流程的作用域推导变量树，处理嵌套对象与数组引用。连线时校验重复边、环路和不允许的跨作用域连接。Vue Flow 提供节点端口和连线交互，哪些连接在业务流程里有效，还要结合流程规则判断。 <a href="https://vueflow.dev/guide/handle.html">Vue Flow 节点端口文档</a></p>
+<p>分支汇合是个容易漏的场景。假设只有某个条件分支会生成一项输出，其他分支走到同一个下游时，这项值可能为空。发布前检查引用时，可以把“变量在编辑器里可见”和“这一条执行路径上有值”分别验证。需要默认值或空值处理时，也应该在节点配置里表达出来。</p>
+<h2 id="section-3">让编辑者看得懂这次改了什么</h2>
+<p>发布前通常要回看一下草稿与线上版本的差异。直接比较整份配置，会混进节点位置、字段顺序和结构调整，想找一个参数变化就要翻很久。项目有配置归一化后的差异审阅，也会检查失效引用，让编辑者把注意力放在这次真正要确认的改动上。</p>
+<p>历史版本在查看时保持只读。打开旧版本，可以核对当时的节点和参数。继续编辑时则回到当前草稿，这样查看和修改有各自的入口。</p>
+<p>运行调试还需要再往后看一步。平台对接了后端 DAG 执行和节点记录，界面可以查看执行进度。有些节点还处在模拟或执行器待接入阶段。验收时要把能连线、能保存和能实际执行分成三项。一个节点出现在菜单里，只能先确认界面提供了这个配置入口。</p>
+<p>测试发布时，我会连着做一次删边和改参数，再去已发布的配置里对照两处改动。如果两边都对上，再选一个已接入执行器的节点跑一次，看调试结果是否反映了这次修改。</p>
+<p>不同场景怎样选择流程结构，见<a href="../agent-patterns/">从业务场景选择 Agent 的七种工程模式</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

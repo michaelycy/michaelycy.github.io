@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="从客服草稿试点出发，安排离线评估、影子对照、灰度与人工接管。">
+  <title>Agent 功能怎样试点和放量 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">Agent 运行与交付</p><h1>Agent 功能怎样试点和放量</h1><ul class="article-tags" aria-label="能力标签"><li>灰度发布</li><li>技术选型</li><li>发布治理</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">先拿现在的做法当基线</a></li><li><a href="#section-2">每一步用什么条件放行</a></li><li><a href="#section-3">停止新任务以后，剩下的怎么办</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>给客服团队加一个助手，可以先从“根据工单和制度写一份处理草稿”做起。客服照常确认并发出回复。这样能先看到草稿究竟节省了多少时间，也能知道系统最常在哪类工单上弄错。等这些问题清楚了，再决定哪些步骤可以自动化。</p>
+<h2 id="section-1">先拿现在的做法当基线</h2>
+<p>挑一个输入、产出和负责人都说得清的任务。以客服工单为例，先确认目前怎样找资料、谁负责判断特殊情况、一次误判会带来多少返工。拉一批脱敏样本，覆盖常见请求、缺资料、政策冲突和必须升级人工的情况。用同一批样本比较现有流程和新方案，记录结果质量、处理时间、人工接管及费用。</p>
+<p>原型阶段可以用只读查询和测试数据。做完后先问哪里没有达到要求。缺少可靠知识时，优先补资料；权限太复杂时，先收窄对象范围；错误主要集中在少数类别时，可以直接交给现有流程处理。路径固定的工作继续由程序推进，需要理解自由表达或起草回复的环节再交给模型。 <a href="https://www.anthropic.com/research/building-effective-agents">Anthropic 关于工作流和 Agent 的说明</a></p>
+<h2 id="section-2">每一步用什么条件放行</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>先看哪项结果</th>
+<th>出问题怎样退</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>离线验证</td>
+<td>典型任务能完成，权限和异常用例通过</td>
+<td>调整范围或回到现有流程</td>
+</tr>
+<tr>
+<td>影子对照</td>
+<td>用同类输入对照草稿与人工结果</td>
+<td>停止镜像，保留差异样本</td>
+</tr>
+<tr>
+<td>小范围试用</td>
+<td>草稿可用，接管可达，成本在预算内</td>
+<td>暂停新任务，切回人工</td>
+</tr>
+<tr>
+<td>按范围放量</td>
+<td>分组指标稳定，值班与回滚路径可用</td>
+<td>按版本或功能开关收回</td>
+</tr>
+</tbody>
+</table></div>
+<p>影子对照只产出用于比较的结果，禁用真实提交、发送和删除。正式灰度按合适的单位固定分组，比如团队或会话，避免一次对话中途切版本。每次放量要同时看样本量和覆盖范围。高频查询很快能看到趋势，低频异常可能需要专门演练。到了预定日期但证据还不够，就维持当前范围。</p>
+<h2 id="section-3">停止新任务以后，剩下的怎么办</h2>
+<p>放量前要约定谁来暂停，以及哪些情况立即停。越权访问和重复执行可以作为硬条件，草稿采用率或人工用时则看足够的样本。已有任务分开处理。正在等待审批的，明确由谁接手以及批准是否仍有效。已经调用外部系统但未收到结果的，保留操作编号继续核对。用户还在等结果时，页面给出真实状态与可用入口。</p>
+<p>第一阶段如果只能稳定做到“生成草稿，人工确认”，也有可衡量的价值。看看客服实际用了多少草稿，改动集中在哪些字段，再决定下一次投入放在资料治理、回复质量还是自动提交。</p>
+<p>评测集与发布门槛可以参照 <a href="../agent-release-evaluation/">Agent 评测怎样进发布流程</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

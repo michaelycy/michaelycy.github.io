@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="从扫描 PDF 出发，讲翻译任务如何分步执行、补译和恢复进度。">
+  <title>文档翻译任务怎样在刷新和失败后继续 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">项目实践</p><h1>文档翻译任务怎样在刷新和失败后继续</h1><ul class="article-tags" aria-label="能力标签"><li>文档翻译</li><li>异步任务</li><li>故障恢复</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">一份文件，后台要做几件不同的事</a></li><li><a href="#section-2">模型返回了内容，还要检查条目齐不齐</a></li><li><a href="#section-3">重新打开页面，从服务端接回进度</a></li><li><a href="#section-4">后台恢复前，先核对这一步留下了什么</a></li><li><a href="#section-5">失败恢复和再翻译是两种操作</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>拿一份扫描 PDF 举例。用户提交以后等了一会儿，看到页面还在识别文字，就切去做别的事。再回到工作台时，他想知道前面做了多少、还有哪一步没跑完。如果这时页面只会重新转圈，他很难判断该等一等，还是再点一次翻译。</p>
+<p>我以全栈开发参与了这个文档翻译平台，工作涉及文档管理、翻译任务和结果工作台。一个任务会经过解析、识别、翻译和生成，期间还可能碰到网络断开、模型返回不全和后台进程重启。把这些阶段拆开，才有办法分别处理。</p>
+<h2 id="section-1">一份文件，后台要做几件不同的事</h2>
+<p>PDF、Word、表格和图片的处理路径有差别。扫描页需要 OCR，有文本层的页则可能直接提取内容。文本翻译和图片里的文字处理，有些部分可以各自推进，最后再为导出合并结果。</p>
+<p>项目通过 Celery 和 Redis 调度后台任务，并持久化每个步骤的状态。步骤之间的依赖用有向无环图表达。这样一来，排版步骤可以等它真正需要的结果，文本分支也可以在条件满足后先跑。下面用常见的文本与图像分支示意依赖关系，实际节点会随文档格式变化。</p>
+<p><a class="article-figure" href="../assets/10-translation-workflow.svg" title="查看原图"><img src="../assets/10-translation-workflow.svg" alt="文档翻译任务中解析、分支处理与生成之间的依赖" loading="lazy"></a></p>
+<details>
+<summary>查看 Mermaid 源码</summary>
+<pre><code class="language-mermaid">flowchart TD
+    A[提交文档] --&gt; B[解析与按需识别]
+    B --&gt; C[文本分批翻译]
+    B --&gt; D[处理图片中的文字]
+    C --&gt; E[汇总所需结果]
+    D --&gt; E
+    E --&gt; F[排版和按格式生成]
+</code></pre>
+</details>
+<p>模型调用出错时，可以先看解析和识别的结果是否齐全、是否还适用。前面的结果用得上，恢复范围就能缩到出问题的步骤或批次。</p>
+<h2 id="section-2">模型返回了内容，还要检查条目齐不齐</h2>
+<p>长文档要分批送进模型。某批本来有十个文本块，模型可能只返回九个，也可能因为输出截断留下半条结果。如果界面只接到一个“请求成功”，漏掉的条目就可能直到生成文件时才被发现。</p>
+<p>项目按上下文预算拆分批次，返回后再把条目对回原来的文本块。中间少一项时，只按顺序拼接会让后面的译文跟着错位。遇到批次对不齐，代码会尝试拆小重发，再补齐漏掉的条目。补译后仍然是空的，就保留该处原文。验收译文时需要留意这种回退，页面上有字也可能意味着这一段还需要人工处理。</p>
+<p>术语也随批次进入翻译上下文。行业自动匹配的术语和手工补的词条需要合并，再按目标语言挑选。这一点对再翻译尤其重要。同一个文件切换目标语言后，解析和 OCR 结果可能还适用，原来的目标语言术语却要重新选。</p>
+<h2 id="section-3">重新打开页面，从服务端接回进度</h2>
+<p>工作台用 WebSocket 接收变化，通过查询缓存更新对应的任务，再用摘要、详情查询和受控轮询补齐状态。用户切到另一个页面或开了新的标签页，可以根据服务端记录重新看到任务。</p>
+<p>页面刷新时，先查询当前任务快照，会比等下一条推送更稳。假设导出完成的通知刚好在网页关闭期间发出，等一条新消息可能什么也等不到。快照却能告诉页面，任务已经结束，译文是否可用。网络不稳定时再轮询一段时间，任务到达终态后可以停止。</p>
+<p>跨账号也有相似的问题。旧账号的请求比新账号的结果晚到时，页面要把旧响应留在原来的账号作用域里。否则即使后台的任务权限正确，界面仍可能短暂出现一条不属于当前账号的旧记录。</p>
+<h2 id="section-4">后台恢复前，先核对这一步留下了什么</h2>
+<p>Worker 重启后，持久化的步骤记录能让恢复逻辑找到卡住的任务。接着还要看结果存到哪一步了。比如文件已经写到存储里，步骤的完成状态却没来得及保存。把它和“文件还没生成”当成同一种失败，重跑以后就可能留下两份结果。</p>
+<p>项目恢复时会先向 Worker 查询活跃任务。一个 Worker 都没回应，这轮就先结束，免得把暂时联系不上的任务误判为已经停止。接下来还会分情况处理。原调度任务已经丢失、但记录仍在时，可以接回流程。调度记录已经清除、仅剩运行中的步骤时，则对残留步骤收尾，避免把已放弃的任务重新拉起来。</p>
+<p>验收时可以把停止的位置拆开测。一次在开始工作之前停止，一次在产生结果之后、写完成状态之前停止。前者要确认工作还能被接手，后者要核对已有产物会怎么处理。Celery 的消息确认时机和 Worker 异常退出配置也会影响消息是否再次投递，适合与业务步骤状态分开验证。 <a href="https://docs.celeryq.dev/en/stable/userguide/tasks.html">Celery 任务与消息确认文档</a></p>
+<p>取消也值得单独走一遍。用户发出取消请求时，可能已经有调用在途。页面可以说明正在处理取消，最终状态再从服务端核对。这样用户能区分“已发出取消请求”和“任务已经停下来”。</p>
+<h2 id="section-5">失败恢复和再翻译是两种操作</h2>
+<p>用户改了目标语言或术语后再翻译，项目会创建一个独立任务，在已有结果覆盖的页范围内复用解析和 OCR 资产。等所需资产复制完再进入就绪状态，中间失败则回滚并清理新任务的资源。原任务的译文仍然可以查看。</p>
+<p>想接着做原来那次翻译，可以回到原任务查看恢复结果。想换一种翻译配置，可以在一个新任务里比较结果。两次任务分别保留自己的状态和译文。</p>
+<p>给工作台做验收时，可以在一份扫描 PDF 还在识别文字时关掉页面，等一会儿再回来。看页面能否直接说明文件处理到了哪一步，以及用户该继续等、重试，还是可以打开译文。</p>
+<p>相关设计可以接着看<a href="../enterprise-agent-architecture/">企业级 Agent 系统的架构与运行治理</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

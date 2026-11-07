@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="把口语问题转成可校验的查询，保留编号、时间和业务条件。">
+  <title>Agent 语义理解与检索链路的设计 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">记忆与知识检索</p><h1>Agent 语义理解与检索链路的设计</h1><ul class="article-tags" aria-label="能力标签"><li>语义检索</li><li>查询改写</li><li>混合检索</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">一、分清几种经常混用的“语义转换”</a></li><li><a href="#section-2">二、把一次查询拆成可检查的中间结构</a></li><li><a href="#section-3">三、改写的目标是补清楚，不能改需求</a></li><li><a href="#section-4">四、不要让向量检索承担所有查询</a></li><li><a href="#section-5">五、关键词、向量和重排怎样配合</a></li><li><a href="#section-6">六、向量模型和索引需要一起管理</a></li><li><a href="#section-7">七、阈值要跟着业务校准</a></li><li><a href="#section-8">八、这些边界情况要单独验证</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>用户问“上次那个申请为什么没过”，系统要先弄清楚“上次”是哪一次、“申请”是什么对象，然后才能查询。直接把整句话转成向量，可能找到很多关于审批失败的说明，却找不到真正的那笔申请。</p>
+<p>Agent 系统中的语义转换，可以拆成四件事：理解用户意图，把表达规范成可查询的条件，把文本转成适合检索的表示，再把检索结果还原成有证据的回答。它们之间要保留可核对的中间结果。模型一次输出了合法 JSON，只能说明格式符合要求，还不能证明理解正确。</p>
+<h2 id="section-1">一、分清几种经常混用的“语义转换”</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>环节</th>
+<th>处理的内容</th>
+<th>典型输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>意图与实体识别</td>
+<td>用户要做什么、提到了什么对象</td>
+<td>查制度、查申请、城市、日期、申请号</td>
+</tr>
+<tr>
+<td>查询规范化与改写</td>
+<td>口语、别名、指代和省略</td>
+<td>完整查询、标准实体、明确时间条件</td>
+</tr>
+<tr>
+<td>检索表示生成</td>
+<td>将查询或资料变成检索可用表示</td>
+<td>关键词、向量、结构化过滤条件</td>
+</tr>
+<tr>
+<td>查询编排</td>
+<td>决定去哪里查、是否需要补查</td>
+<td>文档检索、业务 API、受控数据库查询</td>
+</tr>
+<tr>
+<td>证据组织</td>
+<td>把结果整理成可引用依据</td>
+<td>原文片段、版本、来源、缺失条件</td>
+</tr>
+</tbody>
+</table></div>
+<p>embedding 是其中一种表示方式。它将内容映射到向量空间，帮助寻找相近内容，但相近不等于相同，更不等于真实。“允许外派”和“不允许外派”可能共享大量词语和语境，不能只靠向量距离裁决规则是否相反。</p>
+<p>意图识别也不应该直接触发写操作。用户说“看看能不能取消”，可能是在询问条件。先识别为查询取消规则，比直接调用取消接口更符合这句话的含义。</p>
+<h2 id="section-2">二、把一次查询拆成可检查的中间结构</h2>
+<p>假设用户问：“2026 年 10 月 20 日去上海出差，当时住宿怎么报销？”可以先得到这样的候选结构：</p>
+<pre><code class="language-json">{
+  &quot;intent&quot;: &quot;query_travel_policy&quot;,
+  &quot;original_query&quot;: &quot;2026年10月20日去上海出差，当时住宿怎么报销？&quot;,
+  &quot;normalized_query&quot;: &quot;查询2026年10月20日生效且适用于上海出差的住宿报销规则&quot;,
+  &quot;constraints&quot;: {
+    &quot;destination&quot;: &quot;上海&quot;,
+    &quot;effective_on&quot;: &quot;2026-10-20&quot;,
+    &quot;topic&quot;: &quot;住宿报销&quot;
+  },
+  &quot;unresolved&quot;: [&quot;适用的公司主体和员工类别&quot;],
+  &quot;needs_clarification&quot;: true
+}
+</code></pre>
+<p>这是候选查询，服务端还要校验日期、枚举值和实体归属，并补上可信身份信息。公司主体和员工类别可以从经过授权的组织系统取得；取不到时再问用户，不能让模型凭聊天风格猜职级。</p>
+<p>在本次任务中保留原始问题，后续如果改写错了，才能比较到底丢了哪个条件。长期日志则按需要脱敏、限制访问并设置保留期限，不必永久保存所有原文。标准实体可以同时保留原始表达和业务 ID，避免把同名公司、相近产品或同城不同区域误认为同一对象。</p>
+<p>相对时间要绑定请求时点和时区。今天晚上问的“明天”，不能因为后台任务在午夜后重试，就自动变成另一天。“上个月”涉及一段时间，如果期间规则发生变化，应进一步确认具体业务日期，或按多个有效区间分别回答。</p>
+<h2 id="section-3">三、改写的目标是补清楚，不能改需求</h2>
+<p>常见改写包括纠正错别字、补全指代、展开经过维护的业务缩写，以及把口语转成资料中的标准说法。对编号、版本号、金额、否定词和限制条件，要格外保守。</p>
+<p>比如“不是外派的员工能不能申请”，不能改写成“外派员工申请条件”；“v2 接口还有没有限流”不能只搜“接口限流”。如果指代对象有两个合理候选，应该询问，或在只读场景分别查询后说明对应关系。</p>
+<p>保留原始查询参与召回，是减少改写误差的一种办法。改写查询作为补充，不必完全替代原文。多查询扩展可以提高覆盖范围，但应限制数量、合并重复结果，并记录每个结果由哪条查询召回。</p>
+<p>Azure 的查询改写文档也提示，改写可能丢失原查询中的精确术语和产品编号。该托管能力在核对时仍标为预览，是否采用需要单独检查服务支持与稳定性；这里借鉴的是保留原查询和验证约束的思路。<a href="https://learn.microsoft.com/en-us/azure/search/semantic-how-to-query-rewrite">查询改写的行为与限制</a></p>
+<h2 id="section-4">四、不要让向量检索承担所有查询</h2>
+<p>可以把查询分成几类处理。明确的申请编号优先走精确查询；实时状态走业务 API；描述某类现象的问题走全文或向量检索；统计数量和金额走经过授权的聚合接口。混合问题可以拆开查询，再合并证据。</p>
+<p><a class="article-figure" href="../assets/06-semantic-retrieval.svg" title="查看原图"><img src="../assets/06-semantic-retrieval.svg" alt="从语义理解到证据回答的检索链路" loading="lazy"></a></p>
+<details>
+<summary>查看 Mermaid 源码</summary>
+<pre><code class="language-mermaid">flowchart TD
+    A[原始问题与可信会话上下文] --&gt; B[识别意图 实体与约束]
+    B --&gt; C{有关键歧义吗}
+    C --&gt;|有| D[询问或列出可选对象]
+    C --&gt;|没有| E[生成并校验查询计划]
+    E --&gt; F[精确查询与业务 API]
+    E --&gt; G[关键词与向量召回]
+    G --&gt; H[融合 去重与重排]
+    F --&gt; I[证据适用性与完整性检查]
+    H --&gt; I
+    I --&gt; J{证据是否足够}
+    J --&gt;|足够| K[回答并关联证据]
+    J --&gt;|不足且可补查| E
+    J --&gt;|无法确认或耗尽预算| L[返回缺失条件或结束]
+</code></pre>
+</details>
+<p>如果需要生成 SQL，最好先生成受限的查询结构，再由程序编译成参数化语句。数据库使用只读账户、行级权限、允许访问的表和字段、超时及结果限制。即使 SQL 解析通过，也要检查是否跨租户、是否进行了过重扫描，以及是否调用了允许范围外的函数。</p>
+<p>查询链路和业务写入链路分开。理解出“取消申请”的意图，可以用于读取取消条件或准备草案；实际取消仍要经过独立的权限、对象状态和授权检查。</p>
+<h2 id="section-5">五、关键词、向量和重排怎样配合</h2>
+<p>关键词检索保留精确术语，向量检索补充语义相近的表达。中文语料还要检查分词、业务词典、中英文混写和编号分隔符，不能只看英文样例上的效果。</p>
+<p>召回可以多路执行，再按文档与内容块 ID 去重。RRF 是一种按各路排名融合的方法，避免把不同检索器的原始分数直接混在一起。它仍然需要选择候选窗口，并验证最终排序，不能代替业务适用性判断。<a href="https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion">Elasticsearch 的 RRF 说明</a></p>
+<p>重排根据问题与候选片段的关联重新排序；随后还要核对生效日期、业务范围和原文是否包含必要例外。把无关或过期内容排到第一名，并不会让它变成正确证据。</p>
+<p>还应对同一文档的重复片段、几乎相同的附件副本进行控制，避免上下文被一个来源占满。需要多方面依据的问题，可以明确要求覆盖不同条件或独立来源，而不是单纯取排名前几段。</p>
+<h2 id="section-6">六、向量模型和索引需要一起管理</h2>
+<p>文档与查询应使用兼容的向量模型和输入规范。有些模型区分查询和文档前缀，忽略这些约定可能影响效果。模型版本、维度、归一化方式、距离函数和索引参数都应记录在索引配置中。</p>
+<p>维度一致只是能放进同一类字段，不代表不同模型的向量可以比较。更换模型时建立新索引，完成同一问题集的对照评估后切换，不要把新向量直接混进旧模型的索引。</p>
+<p>写入时校验空文本、过长输入、非法数值、维度和编码异常。embedding 服务超时应留下可重试的入库状态，不能把缺失向量的文档当作已经完成全部索引。若只建好了关键词索引，可以明确标记为降级可检索状态。</p>
+<p>近似检索也有召回损失，权限或类别过滤可能进一步减少结果。pgvector 的迭代扫描提供了增加扫描范围的方式，但达到扫描上限后仍可能不足。小规模授权候选可以比较精确搜索，较大负载再测试索引、分区或专用检索方案。<a href="https://github.com/pgvector/pgvector#filtering">pgvector 检索与过滤</a></p>
+<h2 id="section-7">七、阈值要跟着业务校准</h2>
+<p>“相似度高于 0.8 就回答”通常不适合作为通用规则。不同模型、距离函数和语料分布下，分数含义不同；融合分数和重排分数又是另一套量纲。</p>
+<p>先标注一组问题、相关证据和不可回答情境，观察真正相关与无关结果的分布，再选择阈值和召回数量。答案是否足够，还要检查关键条件是否齐全、证据是否矛盾、资料是否过期。排名第一只意味着它在这批候选里靠前。</p>
+<p>评估可以拆成三组：意图和约束是否解析正确，授权范围内的正确证据能否召回，最终回答是否被证据支持。对多跳问题，单一片段的命中率不够，还要看完成推理需要的证据是否全部出现。</p>
+<p>每次修改词典、改写提示、模型或索引配置，都在同一验证集上做对照。保留原始查询、规范化条件、各路召回来源和最终证据，才能判断改动到底改善了哪里。</p>
+<h2 id="section-8">八、这些边界情况要单独验证</h2>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>输入或故障</th>
+<th>处理方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“上次那个申请”对应多个对象</td>
+<td>请求澄清，不擅自选最近一条</td>
+</tr>
+<tr>
+<td>编号和自然语言语义不一致</td>
+<td>保留编号，提示冲突并核实</td>
+</tr>
+<tr>
+<td>句子含否定、例外或历史日期</td>
+<td>转成显式条件，检查改写前后是否保留</td>
+</tr>
+<tr>
+<td>向量服务失败</td>
+<td>按允许范围降级到关键词，明确覆盖能力变化</td>
+</tr>
+<tr>
+<td>多路召回有一路失败</td>
+<td>记录部分失败，检查剩余证据能否支撑结论</td>
+</tr>
+<tr>
+<td>零结果</td>
+<td>区分正常无证据、过滤后不足、服务异常</td>
+</tr>
+<tr>
+<td>重复补查没有新增证据</td>
+<td>停止循环，返回缺少的条件</td>
+</tr>
+<tr>
+<td>检索片段出现操作指令</td>
+<td>作为数据处理，不提升为系统规则</td>
+</tr>
+<tr>
+<td>证据之间存在冲突</td>
+<td>转入冲突处理，不能按最高分直接裁决</td>
+</tr>
+</tbody>
+</table></div>
+<p>语义链路是否可靠，最终体现在用户能否从一句口语走到一次可核对的查询。把意图、约束、表示和证据分别管好，比把所有不确定性都交给一个“语义搜索”接口更容易改进。</p>
+<hr>
+<p>资料核对日期：2026 年 11 月 7 日。整体 RAG 流程见<a href="../knowledge-base-integration/">知识库协作</a>，冲突资料的后续处理见<a href="../knowledge-conflicts/">知识冲突方案</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

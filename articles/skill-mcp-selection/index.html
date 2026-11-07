@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="能力重叠时，按任务、权限和副作用选工具，并判断失败后能否切换。">
+  <title>多个 Skill 与 MCP 工具的选择和治理 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading"><p class="article-topic">工具与工程实践</p><h1>多个 Skill 与 MCP 工具的选择和治理</h1><ul class="article-tags" aria-label="能力标签"><li>工具集成</li><li>MCP</li><li>Agent Skills</li></ul></div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">一、Skill 和 MCP 先分层理解</a></li><li><a href="#section-2">二、先把“做同一件事”说具体</a></li><li><a href="#section-3">三、注册能力时，保存业务语义</a></li><li><a href="#section-4">四、先做硬筛选，再做排序</a></li><li><a href="#section-5">五、多套 Skill 可以组合，但要有主次</a></li><li><a href="#section-6">六、失败切换要区分读取和写入</a></li><li><a href="#section-7">七、用一个报告任务看完整取舍</a></li><li><a href="#section-8">八、运行中的治理和异常边界</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>一个 Agent 同时装了两套写作 Skill，连接了两个文档服务，还能通过浏览器编辑网页。用户只说“把这份报告整理好”，系统突然有了很多条可走的路。</p>
+<p>这时的困难不在于能力不够，而在于能力重叠：哪套流程负责，结果放哪里，多个工具会不会重复执行，失败后能不能换一条路。比较稳妥的做法，是先确定任务契约和授权范围，再筛选可用能力，最后在满足条件的候选里比较质量、成本和稳定性。</p>
+<h2 id="section-1">一、Skill 和 MCP 先分层理解</h2>
+<p>Skill 通常封装某类任务的步骤、约束、参考资料和脚本。Agent Skills 规范以包含 <code>SKILL.md</code> 的目录描述这类能力，可以按需加载正文和附属资源。<a href="https://agentskills.io/specification">Agent Skills 规范</a></p>
+<p>MCP 是连接模型应用与外部能力的协议，可以提供工具、资源和提示等接口。它主要解决发现与调用的接入方式。MCP 工具也可能封装一整套业务流程，并非只能提供很细的原子操作。<a href="https://modelcontextprotocol.io/specification/2026-07-28">MCP 规范</a></p>
+<p>两者可以一起使用：一个报告 Skill 规定先核对来源、再写初稿、最后审校；文档读取和保存通过 MCP 工具完成。按当前规范，MCP 还列有 Skills over MCP 等可选扩展，因此两者也可能在分发方式上结合。职责分层仍然值得保留：工作步骤怎么组织，与底层能力通过什么接口接入，分别判断。</p>
+<p>实际接多个 MCP Server 时，宿主为每个 Server 管理对应的 Client 实例。常见传输有本地 stdio 和远程 Streamable HTTP。按 2026-07-28 规范，新版在每个请求中声明协议版本，旧版通过 <code>initialize</code> 握手协商，接入前要核对两端实际支持的版本。HTTP 服务采用规范内的授权机制时，按对应的 OAuth 规范接入。 <a href="https://modelcontextprotocol.io/specification/2026-07-28/architecture">MCP 架构</a> · <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning">版本兼容</a> · <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization">授权规范</a></p>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>层次</th>
+<th>决定什么</th>
+<th>重叠时主要比较什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>任务契约</td>
+<td>目标、输入、输出、允许影响</td>
+<td>是否符合用户当前要求</td>
+</tr>
+<tr>
+<td>Skill 或工作流</td>
+<td>步骤、质量标准、异常处理</td>
+<td>哪套方法适用，是否互补</td>
+</tr>
+<tr>
+<td>工具与数据提供方</td>
+<td>读取、计算、编辑或提交</td>
+<td>语义、权限、数据源、输出与副作用</td>
+</tr>
+<tr>
+<td>运行控制</td>
+<td>身份、预算、审批、恢复</td>
+<td>是否允许执行，怎样安全结束</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="section-2">二、先把“做同一件事”说具体</h2>
+<p>两个工具都叫 <code>search</code>，一个搜内部制度，一个搜公开网页，它们不能直接互相替代。两个工具都叫“创建文档”，一个返回本地文件，一个在共享空间发布，业务后果也不同。</p>
+<p>任务契约至少写清楚：输入是什么，要得到什么格式的输出，保存到哪里，允许读取哪些数据，是否涉及对外发布，以及怎样算完成。用户指定本地目录，就不能因为某个 Skill 默认上传云文档而擅自改变目的地。</p>
+<p>如果用户指定了工具或 Skill，在宿主平台规则和权限允许的范围内优先遵从。指定工具无法完成必要能力时，先完成不依赖它的部分，再说明具体缺口；不能为了绕过权限拒绝，悄悄换成更宽泛的浏览器或命令行路径。</p>
+<p>Skill 正文可能包含默认流程，也可能包含需要宿主实施的强制约束。其优先级由实际平台定义，不能自行假设所有 Skill 的“必须”都高于用户要求。尤其是上传、发送、删除等外部动作，Skill 的文字本身不构成用户授权。</p>
+<h2 id="section-3">三、注册能力时，保存业务语义</h2>
+<p>除了名称和描述，能力目录可以保存以下信息。它是应用侧的治理结构，不是要求所有 MCP 服务都原样提供这些字段。</p>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>信息</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>稳定能力 ID 与提供方 ID</td>
+<td>区分同名工具，关联历史结果</td>
+</tr>
+<tr>
+<td>契约与版本</td>
+<td>明确输入、输出、错误和兼容性</td>
+</tr>
+<tr>
+<td>可访问数据与身份方式</td>
+<td>判断数据源和权限是否符合任务</td>
+</tr>
+<tr>
+<td>副作用类型</td>
+<td>区分读取、草稿、创建、覆盖、发布、删除</td>
+</tr>
+<tr>
+<td>幂等与状态查询能力</td>
+<td>判断超时后能否重试或核对</td>
+</tr>
+<tr>
+<td>产物格式与目标位置</td>
+<td>判断输出是否真的可交付</td>
+</tr>
+<tr>
+<td>数据处理边界</td>
+<td>确认内容能否发送到该服务</td>
+</tr>
+<tr>
+<td>可观测的质量与健康状态</td>
+<td>比较成功率、延迟、故障和成本</td>
+</tr>
+</tbody>
+</table></div>
+<p>同名工具使用内部唯一的提供方标识加工具名定位，不能只拼接服务自报的名称，因为自报名称本身也可能重名。MCP 工具规范明确讨论了跨服务器的工具名称冲突，并提醒客户端不要无条件信任工具行为注解。<a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools">MCP 工具定义与命名</a></p>
+<p>工具声明“只读”“幂等”可以辅助发现，但生产准入还要通过文档、实现审查或契约测试核实。自然语言描述不能代替真实的权限边界。</p>
+<p>自己设计工具时，先把业务动作起清楚。例如“查询退款进度”和“提交退款申请”分开，查询工具返回所需状态与分页信息，提交工具把授权和状态检查留在业务服务里。枚举、必填项和类型可以用 Schema 表达，服务端仍要校验对象归属、金额范围及当前状态。模型能给出符合 Schema 的参数，也可能选错订单。</p>
+<h2 id="section-4">四、先做硬筛选，再做排序</h2>
+<p>第一步排除不符合条件的候选：没有权限、数据不能发送过去、输出格式不对、目标位置不符、写入风险无法管理、契约不兼容。价格再低，也不能抵消这些问题。</p>
+<p>剩下的候选，再比较业务适配程度、权威数据源、结果质量、稳定性、延迟和成本。用户查询当前申请状态，直连申请系统的受控接口通常比搜索历史邮件更合适；用户要核对网页最终排版，浏览器检查又可能是必要步骤。</p>
+<p>不必给所有因素凑一个复杂的加权分数。小系统可以先用明确规则：当前状态查权威接口，编辑用支持目标格式的结构化工具，页面交互才用浏览器。等到候选数量多、负载差异明显时，再引入基于真实任务结果的排序。</p>
+<p><a class="article-figure" href="../assets/07-capability-selection.svg" title="查看原图"><img src="../assets/07-capability-selection.svg" alt="Skill 与工具候选的筛选和选择流程" loading="lazy"></a></p>
+<details>
+<summary>查看 Mermaid 源码</summary>
+<pre><code class="language-mermaid">flowchart TD
+    A[用户任务与授权范围] --&gt; B[定义输出和完成标准]
+    B --&gt; C[发现相关 Skill 与工具候选]
+    C --&gt; D[按权限 数据边界 语义与副作用过滤]
+    D --&gt; E{还有可用候选吗}
+    E --&gt;|没有| F[说明缺口或请求必要信息]
+    E --&gt;|有| G[按适配 质量 稳定性和成本选择]
+    G --&gt; H[确定主流程与执行提供方]
+    H --&gt; I[记录决策并执行]
+    I --&gt; J[核验产物与实际业务状态]
+</code></pre>
+</details>
+<p>执行前保存选择结果和版本。一个任务进行到一半，能力目录发生更新，不应无条件换成新提供方。确需切换时，重新检查契约和未完成操作。</p>
+<h2 id="section-5">五、多套 Skill 可以组合，但要有主次</h2>
+<p>“写报告”和“核对引用”是互补能力，可以先后使用；两套都规定完整写作流程的 Skill，通常需要选一套作为主流程，另一套只补充明确缺口。把所有指令一次性加载进上下文，容易产生重复步骤、互相覆盖的输出要求和额外成本。</p>
+<p>可以按阶段加载所需内容：先读候选的用途说明，再读主流程正文，执行到具体环节时再取对应参考资料。Agent Skills 的渐进加载思路有助于控制上下文，但实际的组合和冲突优先级仍要由宿主定义。<a href="https://www.anthropic.com/research/equipping-agents-for-the-real-world-with-agent-skills">Skill 的组织与加载方式</a></p>
+<p>遇到冲突时，把冲突写成具体字段：一个要求生成 Word，另一个要求只保存 Markdown；一个默认发布，当前任务只授权草稿。输出格式、位置和权限都可以确定后，保留符合任务的步骤，去掉不适用的默认行为。若强制规则确实无法同时满足，应停止依赖它的动作并说明原因。</p>
+<p>技能调用还要避免循环依赖。A 要求先运行 B，B 又要求回到 A，运行时应通过执行栈和阶段状态识别，限制深度与次数，而不是继续消耗上下文。</p>
+<h2 id="section-6">六、失败切换要区分读取和写入</h2>
+<p>对于语义一致的只读查询，主接口暂时不可用，可以在总期限内切换经过验证的备用接口。还要确认备用源的时效、权限和数据处理范围相同，不能把缓存旧数据当成当前状态返回。</p>
+<p>写操作的切换更严格。工具 A 创建文档超时，工具 B 也能创建文档，不代表可以立即调用 B。A 可能已经成功，只是回执丢失。应先按稳定操作编号查询 A 的状态；能确认原请求未执行且不会迟到执行，或下游明确支持同一业务意图的跨入口去重，才继续切换。一次查询返回“暂未找到”，不一定足以排除仍在排队的请求。</p>
+<p>同一个幂等键在两个提供方未必共享含义。把相同字符串传过去，不代表两边会互相去重。对于未知结果，要保留核对状态，必要时转人工。<a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/">外部操作的幂等设计</a></p>
+<p>授权失败、资源拒绝和策略阻止不能当作普通可用性故障。此时应修正身份或停止，不应通过另一工具尝试访问同一受限对象。</p>
+<h2 id="section-7">七、用一个报告任务看完整取舍</h2>
+<p>假设任务是“读取指定资料，生成一份本地 Word 报告，审校后放到约定目录”。</p>
+<p>先选择能支持 Word 生成、排版检查和本地交付的主 Skill。资料来自已连接系统时，用能按当前身份读取该资料的接口；创建文档时，优先使用能保持目标格式的工具；最后渲染检查，确认表格、分页和引用。</p>
+<p>另一个 Skill 若擅长引用核对，可以只负责这一阶段。某个 MCP 工具只会创建云文档，可以不参与；浏览器只有在原始资料或目标系统缺少足够接口时才补上。这里的选择来自产物要求，不是“Skill 总比 MCP 好”，也不是“有 MCP 就不能用本地脚本”。</p>
+<p>交付前核对文件是否存在、格式是否可打开、来源是否完整。工具返回“成功”只是一次调用结果，不能代替对最终产物的验证。</p>
+<h2 id="section-8">八、运行中的治理和异常边界</h2>
+<p>能力更新后校验契约兼容性，对已批准任务检查参数与工具版本是否仍一致。工具下架时停止新任务使用，正在执行的任务按已完成操作和实际状态处理，不要直接切换入口。</p>
+<p>远程服务的工具列表也可能随当前授权变化。缓存按服务与授权范围区分，支持列表变更通知时按已声明的能力订阅刷新。调用时还要重新鉴权，不能凭曾经发现过一个工具就放行。 <a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools">MCP 工具发现</a></p>
+<p>第三方 Skill 可能带脚本，MCP 服务也可能返回诱导指令。安装与升级需要来源检查，脚本运行受权限和隔离限制；输出作为数据处理，不因为来自“工具”就升级成系统指令。MCP 官方安全实践列出了代理授权、令牌转发、SSRF 和本地服务等风险，协议接入后仍需要宿主落实相应控制。<a href="https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices">MCP 安全实践</a></p>
+<p>验收时重点覆盖：同名工具、工具列表变化、缺失权限、输出不兼容、局部成功、超时后晚到、写入后切换、Skill 循环和规则冲突。记录候选为何被过滤、最终为何被选中，以及任务是否真的成功，才能逐步改进选择策略。</p>
+<p>一套可维护的选择机制，最终应该能回答三个问题：为什么这次用它，失败后为什么可以或不可以换，结果怎样证明已经完成。能解释这三件事，能力越加越多时，系统才不容易越来越乱。</p>
+<hr>
+<p>资料核对日期：2026 年 11 月 7 日。MCP 链接固定到核对时的 2026-07-28 规范，实际部署需确认宿主、SDK 与服务端支持的版本和扩展。业务执行与恢复参见<a href="../enterprise-agent-architecture/">企业架构文章</a>。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

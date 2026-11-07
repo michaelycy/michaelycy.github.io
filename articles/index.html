@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="母朝阳的 Agent 系统、知识检索与软件工程文章。">
+  <title>技术文章 · 母朝阳</title>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../#articles">返回简历</a><a href="./">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1"><div class="article-heading"><h1>技术文章</h1><p>记录 Agent 系统设计、知识检索与软件工程中的取舍。</p></div>
+      <section class="article-category" aria-labelledby="category-1">
+        <h2 id="category-1">项目实践</h2>
+        <ul class="article-list">
+          <li><a class="article-row" href="document-translation-recovery/">
+            <div><h3>文档翻译任务怎样在刷新和失败后继续</h3><p>从扫描 PDF 出发，讲翻译任务如何分步执行、补译和恢复进度。</p><ul class="article-tags" aria-label="能力标签"><li>文档翻译</li><li>异步任务</li><li>故障恢复</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="pdf-translation-adjustment/">
+            <div><h3>PDF 译文校准的坐标转换与回写</h3><p>从一次拖动看 PDF、OCR 和编辑器的坐标如何对齐，修改怎样写回译文。</p><ul class="article-tags" aria-label="能力标签"><li>PDF 编辑</li><li>坐标变换</li><li>长文档渲染</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="agent-workflow-publishing/">
+            <div><h3>Agent 工作流画布的草稿保存与发布</h3><p>连线、改参数和发布连着发生时，怎样保存草稿并核对发布版本。</p><ul class="article-tags" aria-label="能力标签"><li>可视化工作流</li><li>状态管理</li><li>版本发布</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="agent-chat-sdk/">
+            <div><h3>一套 Chat SDK 怎样同时服务门户和调试窗口</h3><p>门户、调试和回放共享会话逻辑，分别管理实时事件和实例状态。</p><ul class="article-tags" aria-label="能力标签"><li>Chat SDK</li><li>实时通信</li><li>组件架构</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+        </ul>
+      </section>
+      <section class="article-category" aria-labelledby="category-2">
+        <h2 id="category-2">Agent 架构与选型</h2>
+        <ul class="article-list">
+          <li><a class="article-row" href="agent-patterns/">
+            <div><h3>从业务场景选择 Agent 的七种工程模式</h3><p>从任务步骤、验证方式和风险出发，比较七种可以组合的工程模式。</p><ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>工作流编排</li><li>多 Agent 协作</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="enterprise-agent-architecture/">
+            <div><h3>企业级 Agent 系统的架构与运行治理</h3><p>用差旅助手串起任务受理、审批、幂等提交和故障恢复。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 架构</li><li>工作流编排</li><li>故障恢复</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="langchain-vs-langgraph/">
+            <div><h3>LangChain 与 LangGraph 的区别和选型</h3><p>用工具调用和审批流程说明两个框架各管哪一层、什么时候用。</p><ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>LangChain</li><li>LangGraph</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+        </ul>
+      </section>
+      <section class="article-category" aria-labelledby="category-3">
+        <h2 id="category-3">记忆与知识检索</h2>
+        <ul class="article-list">
+          <li><a class="article-row" href="agent-memory/">
+            <div><h3>Agent 记忆系统的分层设计与落地</h3><p>区分任务状态、会话记录和长期偏好，处理记忆写入、纠正与删除。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 记忆</li><li>状态管理</li><li>上下文管理</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="knowledge-base-integration/">
+            <div><h3>知识库与 Agent 的高效协作</h3><p>从文档入库到回答引用，梳理检索、权限与证据校验。</p><ul class="article-tags" aria-label="能力标签"><li>RAG</li><li>混合检索</li><li>知识库治理</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="semantic-retrieval/">
+            <div><h3>Agent 语义理解与检索链路的设计</h3><p>把口语问题转成可校验的查询，保留编号、时间和业务条件。</p><ul class="article-tags" aria-label="能力标签"><li>语义检索</li><li>查询改写</li><li>混合检索</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="knowledge-conflicts/">
+            <div><h3>知识库多文档冲突的识别与处理</h3><p>制度说法不一致时，按适用条件和正式版本裁决，无法确认就转人工。</p><ul class="article-tags" aria-label="能力标签"><li>知识库治理</li><li>规则裁决</li><li>权限控制</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="agent-context-assembly/">
+            <div><h3>Agent 这一轮该带哪些上下文</h3><p>以差旅制度问答为例，处理历史日期、撤权和输入预算。</p><ul class="article-tags" aria-label="能力标签"><li>上下文管理</li><li>状态管理</li><li>权限控制</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+        </ul>
+      </section>
+      <section class="article-category" aria-labelledby="category-4">
+        <h2 id="category-4">Agent 运行与交付</h2>
+        <ul class="article-list">
+          <li><a class="article-row" href="agent-release-evaluation/">
+            <div><h3>Agent 评测怎样进发布流程</h3><p>把结果、工具轨迹和业务状态纳入评测，区分质量比较与发布门槛。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 评测</li><li>发布治理</li><li>质量保障</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="agent-debugging-replay/">
+            <div><h3>Agent 故障怎样定位和安全复跑</h3><p>从一次提交超时出发，追踪任务状态并验证复跑是否会重复写入。</p><ul class="article-tags" aria-label="能力标签"><li>可观测性</li><li>故障恢复</li><li>幂等</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="agent-cost-control/">
+            <div><h3>Agent 调用成本怎样记账和限额</h3><p>按任务汇总调用费用，处理并发额度预占、超时核对和降本评估。</p><ul class="article-tags" aria-label="能力标签"><li>成本控制</li><li>并发控制</li><li>模型调用</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="agent-prompt-injection/">
+            <div><h3>Agent 提示注入怎样限制影响</h3><p>用一份带恶意指令的附件，说明读取、修改与外发各自的权限边界。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 安全</li><li>提示注入</li><li>权限控制</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="agent-pilot-rollout/">
+            <div><h3>Agent 功能怎样试点和放量</h3><p>从客服草稿试点出发，安排离线评估、影子对照、灰度与人工接管。</p><ul class="article-tags" aria-label="能力标签"><li>灰度发布</li><li>技术选型</li><li>发布治理</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+        </ul>
+      </section>
+      <section class="article-category" aria-labelledby="category-5">
+        <h2 id="category-5">工具与工程实践</h2>
+        <ul class="article-list">
+          <li><a class="article-row" href="skill-mcp-selection/">
+            <div><h3>多个 Skill 与 MCP 工具的选择和治理</h3><p>能力重叠时，按任务、权限和副作用选工具，并判断失败后能否切换。</p><ul class="article-tags" aria-label="能力标签"><li>工具集成</li><li>MCP</li><li>Agent Skills</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="vibe-coding-quality/">
+            <div><h3>Vibe Coding 的代码质量与长期维护</h3><p>从验收条件到评审、测试和发布，把 AI 生成的代码纳入日常维护。</p><ul class="article-tags" aria-label="能力标签"><li>AI 辅助开发</li><li>代码评审</li><li>质量保障</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+        </ul>
+      </section></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>
