@@ -209,6 +209,11 @@
   color: var(--muted);
 }
 
+.article-heading .article-date {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
 .article-heading .article-topic {
   margin: 0 0 12px;
   color: var(--accent);

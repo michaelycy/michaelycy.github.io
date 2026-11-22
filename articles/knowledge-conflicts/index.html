@@ -16,7 +16,12 @@
       <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
     </header>
     <main id="article-main" tabindex="-1">
-      <div class="article-heading"><p class="article-topic">记忆与知识检索</p><h1>知识库多文档冲突的识别与处理</h1><ul class="article-tags" aria-label="能力标签"><li>知识库治理</li><li>规则裁决</li><li>权限控制</li></ul></div>
+      <div class="article-heading">
+        <p class="article-topic">记忆与知识检索</p>
+        <h1>知识库多文档冲突的识别与处理</h1>
+        <p class="article-date">发布于 <time datetime="2026-07-24">2026年7月24日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>知识库治理</li><li>规则裁决</li><li>权限控制</li></ul>
+      </div>
       <div class="article-reading-grid">
         <aside class="article-sidebar"><details open><summary>本文目录</summary>
           <nav aria-label="本文目录"><ul><li><a href="#section-1">一、先判断是真冲突，还是适用条件不同</a></li><li><a href="#section-2">二、为裁决准备足够的元数据</a></li><li><a href="#section-3">三、提前确定裁决规则，而不是回答时现想</a></li><li><a href="#section-4">四、入库检测和回答时检测一起做</a></li><li><a href="#section-5">五、用一个完整例子走一遍</a></li><li><a href="#section-6">六、回答和执行采用不同的放行条件</a></li><li><a href="#section-7">七、人工处理要回到知识发布链路</a></li><li><a href="#section-8">八、验证方案是否真的拦住了错误</a></li></ul></nav>
@@ -175,8 +180,7 @@
 <p>除了检查冲突识别是否准确，还要看是否误把正常差异当成冲突、应暂停的动作是否被拦住、人工修复后旧结论是否还会出现。自动裁决正确率必须与人工确认过的适用规则比较，不能让系统自己产生答案再自己判正确。</p>
 <p>内容治理也需要运行指标：未解决冲突数量、受影响任务数、处理时长、同一来源反复出错的频率，以及解决后再次召回旧条款的次数。它们能帮助区分问题出在制度管理、元数据还是检索同步。</p>
 <p>知识库里的分歧不可能靠更会说话的模型彻底消失。系统应该把分歧发现、适用条件、裁决依据和修复责任连起来。能够解释为什么采用一条规则，也能够在无法确认时停住，才算把冲突处理真正接进了 Agent。</p>
-<hr>
-<p>资料核对日期：2026 年 11 月 7 日。裁决流程是工程设计建议，需要由具体业务责任人确认优先关系。检索、版本与权限基础见<a href="../knowledge-base-integration/">知识库协作</a>，结构化条件的提取见<a href="../semantic-retrieval/">语义与检索链路</a>。</p>
+<p>检索、版本与权限基础见<a href="../knowledge-base-integration/">知识库协作</a>，结构化条件的提取见<a href="../semantic-retrieval/">语义与检索链路</a>。</p>
 <a class="article-back" href="../">← 全部文章</a></article>
       </div></main>
     <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>

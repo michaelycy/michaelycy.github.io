@@ -16,7 +16,12 @@
       <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
     </header>
     <main id="article-main" tabindex="-1">
-      <div class="article-heading"><p class="article-topic">Agent 架构与选型</p><h1>从业务场景选择 Agent 的七种工程模式</h1><ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>工作流编排</li><li>多 Agent 协作</li></ul></div>
+      <div class="article-heading">
+        <p class="article-topic">Agent 架构与选型</p>
+        <h1>从业务场景选择 Agent 的七种工程模式</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-04">2026年11月4日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>工作流编排</li><li>多 Agent 协作</li></ul>
+      </div>
       <div class="article-reading-grid">
         <aside class="article-sidebar"><details open><summary>本文目录</summary>
           <nav aria-label="本文目录"><ul><li><a href="#section-1">一、先把五个条件问清楚</a></li><li><a href="#section-2">二、七种模式各自适合解决什么问题</a></li><li><a href="#section-3">三、按场景建立一张初选表</a></li><li><a href="#section-4">四、把选择过程收敛成几步判断</a></li><li><a href="#section-5">五、框架放到下一层再选</a></li><li><a href="#section-6">六、用小规模对照实验决定是否升级</a></li><li><a href="#section-7">七、几个需要提前准备的退出分支</a></li></ul></nav>
@@ -197,8 +202,7 @@
 <p>路由不确定时，允许澄清或进入通用入口；工具循环没有进展时，允许停止；并行缺少关键结果时，允许返回部分完成；计划不再成立时，允许重新规划剩余工作；评估改进到达上限时，允许带着明确问题转人工。</p>
 <p>用户取消时，停止尚未开始的任务并请求取消在途任务，但已经提交到外部系统的动作要单独核对。主 Agent 超时也不代表子任务已经停止，调度层需要传播取消信号、控制任务租约，并处理晚到结果。无法确认是否发生过的外部动作应进入核对状态，而不是直接标记“已取消”。</p>
 <p>选型的落脚点是一份具体判断：任务里哪些步骤固定、哪些需要探索，谁管理共享状态，谁能验证结果，达到什么条件必须停下来。把这些写清楚，再从七种模式中选主结构，后续框架选择通常就容易多了。</p>
-<hr>
-<p>资料核对日期：2026 年 11 月 7 日。七种模式是便于工程讨论的归纳，并非统一标准。评估方法可参考 <a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents">Demystifying evals for AI agents</a>，其中对任务、执行轨迹和结果的区分，适合用于设计上述对照实验。</p>
+<p>评估方法可参考 <a href="https://www.anthropic.com/research/demystifying-evals-for-ai-agents">Demystifying evals for AI agents</a>，其中对任务、执行轨迹和结果的区分，适合用于设计上述对照实验。</p>
 <a class="article-back" href="../">← 全部文章</a></article>
       </div></main>
     <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>

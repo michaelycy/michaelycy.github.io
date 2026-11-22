@@ -16,7 +16,12 @@
       <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
     </header>
     <main id="article-main" tabindex="-1">
-      <div class="article-heading"><p class="article-topic">工具与工程实践</p><h1>Vibe Coding 的代码质量与长期维护</h1><ul class="article-tags" aria-label="能力标签"><li>AI 辅助开发</li><li>代码评审</li><li>质量保障</li></ul></div>
+      <div class="article-heading">
+        <p class="article-topic">工具与工程实践</p>
+        <h1>Vibe Coding 的代码质量与长期维护</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-08">2026年11月8日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>AI 辅助开发</li><li>代码评审</li><li>质量保障</li></ul>
+      </div>
       <div class="article-reading-grid">
         <aside class="article-sidebar"><details open><summary>本文目录</summary>
           <nav aria-label="本文目录"><ul><li><a href="#section-1">一、先区分原型阶段与长期产品</a></li><li><a href="#section-2">二、把一句需求变成可验证的任务</a></li><li><a href="#section-3">三、让 AI 看到稳定的项目事实</a></li><li><a href="#section-4">四、限制每次改动的范围</a></li><li><a href="#section-5">五、按风险设置几层验证</a></li><li><a href="#section-6">六、独立证据比模型互相同意更重要</a></li><li><a href="#section-7">七、质量门槛放到仓库和流水线中</a></li><li><a href="#section-8">八、长期维护靠清楚的边界与责任</a></li><li><a href="#section-9">九、发布后继续验证真实行为</a></li><li><a href="#section-10">十、交付时能给出这些证据，就比较扎实</a></li></ul></nav>
@@ -121,8 +126,7 @@
 <h2 id="section-10">十、交付时能给出这些证据，就比较扎实</h2>
 <p>能够说明需求对应哪些行为变化，最终改了哪些文件，运行了哪些必要检查，哪些边界已经验证，哪些检查因环境限制尚未完成。高影响变更还应给出发布观察方式、数据兼容策略和恢复路径。</p>
 <p>这些信息可以很简短，不需要每次生成长篇报告。真正需要保留的是足以让下一位维护者判断“为什么可信、出了问题从哪里查”的证据。代码生成交给工具加速，工程约束落实到仓库、测试和运行环境中，长期维护才不会只依赖某次对话的上下文。</p>
-<hr>
-<p>资料核对日期：2026 年 11 月 7 日。本文讨论通用工程实践，示例不代表已在当前仓库启用相应流水线或分支规则。涉及 Agent 工具、状态与恢复的实现，可接着阅读<a href="../enterprise-agent-architecture/">企业架构文章</a>。</p>
+<p>涉及 Agent 工具、状态与恢复的实现，可接着阅读<a href="../enterprise-agent-architecture/">企业架构文章</a>。</p>
 <a class="article-back" href="../">← 全部文章</a></article>
       </div></main>
     <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>

@@ -16,7 +16,12 @@
       <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
     </header>
     <main id="article-main" tabindex="-1">
-      <div class="article-heading"><p class="article-topic">Agent 架构与选型</p><h1>LangChain 与 LangGraph 的区别和选型</h1><ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>LangChain</li><li>LangGraph</li></ul></div>
+      <div class="article-heading">
+        <p class="article-topic">Agent 架构与选型</p>
+        <h1>LangChain 与 LangGraph 的区别和选型</h1>
+        <p class="article-date">发布于 <time datetime="2026-06-08">2026年6月8日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>LangChain</li><li>LangGraph</li></ul>
+      </div>
       <div class="article-reading-grid">
         <aside class="article-sidebar"><details open><summary>本文目录</summary>
           <nav aria-label="本文目录"><ul><li><a href="#section-1">一、先更新对 LangChain 的印象</a></li><li><a href="#section-2">二、看差异时，重点看控制权在哪</a></li><li><a href="#section-3">三、标准工具循环适合先用 LangChain</a></li><li><a href="#section-4">四、流程本身是业务资产时，考虑显式画图</a></li><li><a href="#section-5">五、持久化不是断点续传的完整承诺</a></li><li><a href="#section-6">六、按这些场景做初步选择</a></li><li><a href="#section-7">七、旧项目升级时，先检查接口和行为</a></li></ul></nav>
@@ -224,8 +229,7 @@ assert result[&quot;outcome&quot;] == &quot;approved_simulation_no_external_writ
 <p>升级前锁定当前依赖，记录模型与工具契约，收集未完成任务和检查点格式。新版本先验证工具错误、结构化输出、中断恢复、状态持久化和流式事件。已经等待审批的旧任务，可以继续使用旧版本运行时，或通过明确迁移恢复。</p>
 <p>不要把 Python 文档中的代码直接当成 JavaScript 的同名接口；两边理念相近，包名、类型和细节仍需要分别核对。也不要把最新文档描述的每一项能力都理解成所有历史 v1 小版本都支持，部署应锁定并验证具体版本。</p>
 <p>如果标准循环已经能稳定表达任务，就保留 LangChain 这一层；如果业务要求你直接控制状态转移，就向 LangGraph 下沉。最终需要维护的是一套可理解、可验证的执行过程，而不是某个框架名称。</p>
-<hr>
-<p>资料核对日期：2026 年 11 月 7 日。示例采用当日官方 Python 文档中的接口风格，模型示例需要单独配置供应商环境。本系列的整体选型方法见<a href="../agent-patterns/">七种工程模式</a>，外部动作的一致性处理见<a href="../enterprise-agent-architecture/">企业架构</a>。</p>
+<p>本系列的整体选型方法见<a href="../agent-patterns/">七种工程模式</a>，外部动作的一致性处理见<a href="../enterprise-agent-architecture/">企业架构</a>。</p>
 <a class="article-back" href="../">← 全部文章</a></article>
       </div></main>
     <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
