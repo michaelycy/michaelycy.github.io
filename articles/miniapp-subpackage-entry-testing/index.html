@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="分别从商城首页和商品分享卡片进入，记录什么时候能浏览商品、什么时候能选中尺码。">
+  <title>微信商城分包后，首页和分享卡片该怎样验 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">小程序开发</p>
+        <h1>微信商城分包后，首页和分享卡片该怎样验</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-22">2026年11月22日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>微信小程序</li><li>分包</li><li>启动性能</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">点首页，到什么时候算能逛</a></li><li><a href="#section-2">点分享卡片，直到能选中一个尺码</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>顾客从微信最近使用的小程序进商城，首页一出来就开始翻商品。另一位顾客收到朋友分享的卡片，点进去已经知道要买哪一件，只想选个尺码。验收分包时，第一位能不能逛，第二位能不能选，是同一份小程序要回答的两个问题。</p>
+<p>我做全渠道商城时，负责过微信原生小程序的分包规划，也做过图片压缩和资源缓存。商品页要等页面代码，还要等商品查询和图片。验收时可以把这几段等待拆开看，免得见到一块空白就接着调包。</p>
+<h2 id="section-1">点首页，到什么时候算能逛</h2>
+<p>假设首页放在主包，商品详情放在普通分包。从首页进去，先记下顾客什么时候能看到第一屏商品、滑动列表、点开其中一件。顶部导航先出现时，下面可能仍是一排占位图。若把导航出现当作首页可用，列表查询等了多久就会被漏掉。</p>
+<p>这时候再看构建产物才有方向。比如首页明明只展示商品卡片，主包里却带了一套详情页才用得到的大图预览组件，就可以沿公共入口检查引用。微信的官方示例把主包页面和各分包的目录、页面清单分别列在应用配置里。先对上入口，再对照构建结果，就能查出实际给首页带了哪些代码。<a href="https://github.com/wechat-miniprogram/miniprogram-demo/blob/master/miniprogram/app.json">微信小程序官方示例的分包配置</a></p>
+<h2 id="section-2">点分享卡片，直到能选中一个尺码</h2>
+<p>换到聊天里的商品卡片，直接打开同一件有货的商品。普通分包里的详情页启动时还需要主包。顾客跳过了首页操作，详情代码、商品查询和规格数据仍要到位。沿这条路记下商品名出现的时刻，再实际选一次尺码，看哪一刻页面能接受操作并显示选中的值。</p>
+<p>这两个时刻往往比一个总时长更容易解释问题。若商品名和规格都迟迟没出现，先看详情代码何时就绪、查询何时发出。若尺码已经选得动，只有头图空着，就看图片的体积、缓存和请求顺序。记录里写明晚的是哪一步，拿到记录的同事才能找到对应的代码或资源。</p>
+<p>准备发版时，可以在同一候选版本上留下两行记录。</p>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>入口</th>
+<th>从哪里开始计时</th>
+<th>到哪里停止计时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>商城首页</td>
+<td>点开最近使用里的商城</td>
+<td>第一屏商品已可浏览，列表能响应滑动或点击</td>
+</tr>
+<tr>
+<td>商品分享卡片</td>
+<td>在聊天里点开指定商品</td>
+<td>详情对应卡片里的商品，能选中一个有货的尺码</td>
+</tr>
+</tbody>
+</table></div>
+<p>两个入口各自在相同设备、网络和缓存条件下复测，冷启动与再次打开分别记。要讨论这次分包有没有改善体验，还得让调整前后的版本各走一遍同样的入口。这样即便首页早了一点、分享进来的顾客却更晚才能选尺码，两件事也都能在发布记录里看出来。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

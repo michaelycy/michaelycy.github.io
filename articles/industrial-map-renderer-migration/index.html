@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="沿着同一台设备点选、移动标签、保存和重开，验证工业地图切换渲染引擎后的兼容性。">
+  <title>工业地图换渲染引擎时，怎样保住旧图 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">大型项目维护</p>
+        <h1>工业地图换渲染引擎时，怎样保住旧图</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-22">2026年11月22日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>Pixi.js</li><li>坐标转换</li><li>历史配置</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">先拿出一张改过的地图</a></li><li><a href="#section-2">沿着鼠标点下去的位置查</a></li><li><a href="#section-3">挪动 A17 的标签，保存后重新打开</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>假设现场给你一张已经用了几个月的地图。换上新引擎以后，设备还在原来的位置，颜色也对。实施同事放大地图，点中左边的设备，右侧却弹出了相邻设备的详情。只拿两张截图做交接，这个问题很容易过关。</p>
+<p>我参与过一套工业地图编辑与监控系统。现场交付时间紧，最初用 DOM 把地图画出来，后来改用 Pixi.js 做二维渲染。换引擎时，现场已经有人用旧地图查看设备。拿左边这个点位做验收，要能认回原来的设备，也要留住实施同事手工挪过的标签。</p>
+<h2 id="section-1">先拿出一张改过的地图</h2>
+<p>把图复制一份。假设左边设备的编号是 A17，实施同事把它的标签挪到了连线下方。先在旧图里点一下，记下详情编号，再用新引擎打开同一份配置。此时有两处可以独立核对，点位对应 A17，标签也仍在那条线下方。</p>
+<p>第一次对照只打开，不保存，留下原配置。接下来做任何编辑都在副本上进行，回头就能看出是读取旧图时选错了设备，还是第一次保存才改了位置。</p>
+<h2 id="section-2">沿着鼠标点下去的位置查</h2>
+<p>把 A17 的地图横坐标简化为 100。视图先放大两倍，再向右平移 30 像素，它会出现在画布横坐标 230。点中这里时，要先扣掉平移，再除以缩放，得到 100。如果浏览器给的是相对窗口的位置，还要考虑画布在页面里的偏移。用这几个数手算一次，比较容易看出是哪一层多算了一遍。</p>
+<p>PixiJS 的显示对象提供本地和全局坐标转换。至于转换得到的点对应哪个设备，仍然要回到地图自己的标识和选择规则。验收时我会分别在原始比例、放大并平移之后，点同一设备两次，对照弹出的设备编号。只比较指针附近有没有亮起一个点，两个点挨得近时很难发现选错了谁。<a href="https://pixijs.download/v6.5.8/docs/PIXI.DisplayObject.html#toLocal">PixiJS 坐标转换说明</a></p>
+<h2 id="section-3">挪动 A17 的标签，保存后重新打开</h2>
+<p>在放大的副本里，把 A17 的标签从连线下方挪到上方，保存后与原件对照。若连设备点位都跟着改了，就查保存时有没有把视图缩放写进业务坐标。需要支持版本回退时，再把这份新保存的副本交给旧版试读。如果旧版读不懂新的配置格式，上线前还要准备格式转换或旧配置副本。</p>
+<p>关掉编辑器，用监控页重新打开这张图，把画布恢复到原来的比例。点左边的设备，详情里应该仍是 A17。再放大看标签，它应该留在连线上方。若编号对了、标签却又回到下方，接下来就查标签偏移如何写回配置。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

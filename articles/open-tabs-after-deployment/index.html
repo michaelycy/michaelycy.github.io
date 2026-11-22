@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="跟着旧标签页的一次详情请求，检查独立发版与回退后仍有人需要的静态资源。">
+  <title>运营平台发完新版，为什么旧标签页还会出错 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">大型项目维护</p>
+        <h1>运营平台发完新版，为什么旧标签页还会出错</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-22">2026年11月22日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>微前端</li><li>静态资源</li><li>发布回退</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">一次点击，可能跨了两次发布</a></li><li><a href="#section-2">把新开页面和旧页面都放进发布范围</a></li><li><a href="#section-3">回退后再点一次详情</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>假设一位运营同事上午打开后台，在列表里筛出一批记录，午后才第一次点进详情页。旁边刚开浏览器的同事能进去，只有上午留下的那个标签页加载失败。此时先留着页面，打开网络面板看一眼出错的文件名。点了刷新，当时究竟是哪一版入口发出的请求，就难查了。</p>
+<p>我在一套企业数字化运营平台负责过子应用的接入方案，参与建设公共组件、项目模板和发布流程。平台里的 React 和 Vue 子应用可以分别构建、测试和部署。下面拿一个按需加载的详情页举例，看看发布其中一个应用时，还要替哪些已经打开的页面保留条件。</p>
+<h2 id="section-1">一次点击，可能跨了两次发布</h2>
+<p>上午打开的是 A 版，入口脚本知道详情页文件叫 <code>detail.a.js</code>，但用户一直没点进去，浏览器也没有下载它。中午发布 B 版，详情文件变成 <code>detail.b.js</code>。下午点击时，旧标签页仍按上午拿到的文件名发请求。如果部署时顺手清掉了 A 版文件，列表还能操作，进入详情才出现 404。</p>
+<p>这里值得先记下失败的资源地址和响应内容。有时文件确实不存在，有时服务器对失效脚本地址返回了首页 HTML，状态码甚至是 200。两种情况下页面都可能报加载错误，处理办法却不同。Webpack 的内容哈希可以让内容改变后的资源获得新文件名。旧文件会保留多久、什么时候切换入口，则是部署流程要兑现的约定。<a href="https://webpack.js.org/guides/caching/">Webpack 缓存与产物命名</a></p>
+<h2 id="section-2">把新开页面和旧页面都放进发布范围</h2>
+<p>我会让负责子应用的同事留一个旧标签页，负责发布的同事从干净窗口进入。两人打开同一条详情，记录各自实际请求的入口和资源文件。若新窗口也失败，就先检查新入口引用的文件是否齐全。只有旧窗口失败，再查旧资源的保留范围。这样不用先猜是基座、业务应用还是浏览器缓存出了问题。</p>
+<p>部署顺序也能从这个例子倒推出来。可以先放好新版本的完整资源，确认入口引用的文件都可读，再把流量入口切过去。上一套资源的保留时间，应考虑运营人员实际会把页面开多久。若业务确实要求用户升级，提醒前先处理筛选条件、未保存表单和正在提交的操作，避免一次自动刷新把半天的工作一起丢掉。</p>
+<h2 id="section-3">回退后再点一次详情</h2>
+<p>从 B 回退到 A 以后，用干净窗口打开后台，拿到的是 A 的入口。回退前已经打开 B 的人，浏览器里运行的仍是 B 的代码。请他现在才点开详情，看网络面板里请求的 <code>detail.b.js</code> 还能不能取到。即使新窗口里的 <code>detail.a.js</code> 加载正常，走到这里的老会话也可能卡住。脚本加载完，再核对详情请求能否拿回这条记录。</p>
+<p>下次接到类似反馈时，一份带入口版本、出错文件地址和打开页面时间的记录，就比一句「刷新好了」更有用。它能帮助发布同事决定该恢复哪份资源，也能让业务同事判断用户刚才的操作要不要重新确认。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="沿着旧项目的订单路由检验一次构建修复，区分模板复制的文件和可单独升级的共享脚本。">
+  <title>脚手架生成第一个项目以后，怎么升级 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">微前端与前端基建</p>
+        <h1>脚手架生成第一个项目以后，怎么升级</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-22">2026年11月22日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>脚手架</li><li>构建工具</li><li>依赖升级</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">先在旧项目里找出那一行构建配置</a></li><li><a href="#section-2">用周一留下的订单详情验收</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>假设周一用脚手架生成了一个运营子应用。业务同事给它加了订单详情路由，又把示例首页换成了自己的列表。周三发现一处构建问题，修好以后的模板已经能生成正确的产物。周一那个已经改过的项目，怎样带上这次修复，又保住业务同事新写的页面？</p>
+<p>我在运营平台做过子应用模板，把组件、路由和状态管理接进新项目，也搭过 Webpack 构建流程。模板生成的路由文件交到业务团队手里，很快就会长出订单、会员这些平台当初并不知道的页面。等第一份项目被人真正用起来，模板里的文件就各有了维护它的人。</p>
+<h2 id="section-1">先在旧项目里找出那一行构建配置</h2>
+<p>用一个具体的修复举例。假设子应用部署在门户的子目录下，详情页的代码却被打包成从站点根目录加载。首页能开，点进订单才报资源找不到。要把这个修复带给旧项目，先在周一的仓库里顺着构建命令找一遍，看资源路径究竟在哪个文件里设定。</p>
+<p>如果构建配置在生成时就复制进了仓库，周三改模板只会影响后来生成的项目。给周一的项目升级，需要把那处改动单独移过去，并核对业务侧有没有定制过路径。整份模板再铺一次，连用户加过的路由文件也可能被覆盖。</p>
+<p>还有一种放法。在另一套组件基建里，我们把开发脚本做成了独立工具，共享的 ESLint 配置也通过依赖复用。沿用这个思路，如果产生错误路径的逻辑由共享脚本维护，旧项目就可以升级对应的依赖。属于这个子应用的部署目录仍由业务仓库传入。尤其要留意脚本升级后是否多要一个参数，版本号更新并不能替业务填上这个值。</p>
+<h2 id="section-2">用周一留下的订单详情验收</h2>
+<p>给周一的项目保留一条能直达订单详情的测试地址。改完构建配置，先看代码差异，业务同事写的详情路由和列表应该还在。再按旧项目自己的构建命令打包，把产物放在发生问题的子目录下。如果只在本地根路径试一次，原来的路径错误可能一直不会出现。</p>
+<p>在测试宿主里直接打开那笔订单的详情地址，看异步脚本是否从约定的子目录加载，页面显示的编号是否与地址里的订单一致。再从业务列表点进同一笔订单。如果构建已经通过，列表也能打开，偏偏这条旧地址还取不到详情脚本，就沿它实际请求的路径回查刚改的配置。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

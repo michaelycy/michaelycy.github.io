@@ -38,7 +38,70 @@
         </ul>
       </section>
       <section class="article-category" aria-labelledby="category-2">
-        <h2 id="category-2">Agent 架构与选型</h2>
+        <h2 id="category-2">微前端与前端基建</h2>
+        <ul class="article-list">
+          <li><a class="article-row" href="microfrontend-local-host/">
+            <div><h3>微前端子应用怎样单独跑起来</h3><p>从本地会员详情页接回真实基座，核对组织上下文、首次查询和监听清理。</p><ul class="article-tags" aria-label="能力标签"><li>微前端</li><li>single-spa</li><li>本地联调</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="dashboard-widget-instances/">
+            <div><h3>同一张卡片怎样在微前端看板里出现两次</h3><p>在同一看板放两张会员卡，检查换位、刷新和卸载后，筛选条件与请求是否跟着正确的实例。</p><ul class="article-tags" aria-label="能力标签"><li>微前端</li><li>看板</li><li>实例状态</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="resizable-table-columns/">
+            <div><h3>表头拖宽以后，表格内容为什么没跟上</h3><p>跟着一次从 160 到 220 像素的拖动，定位表头与正文在哪一步读到了不同的宽度。</p><ul class="article-tags" aria-label="能力标签"><li>React</li><li>表格组件</li><li>列宽同步</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="scaffold-project-upgrades/">
+            <div><h3>脚手架生成第一个项目以后，怎么升级</h3><p>沿着旧项目的订单路由检验一次构建修复，区分模板复制的文件和可单独升级的共享脚本。</p><ul class="article-tags" aria-label="能力标签"><li>脚手架</li><li>构建工具</li><li>依赖升级</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="survey-draft-compatibility/">
+            <div><h3>问卷改过以后，昨天答到一半的答案怎么办</h3><p>问卷换序、改名或合并选项后，在小程序和 H5 里追踪同一份未答完的问卷。</p><ul class="article-tags" aria-label="能力标签"><li>低代码</li><li>问卷</li><li>草稿恢复</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="sketch-component-mapping/">
+            <div><h3>Sketch 设计稿怎样映射到已有组件</h3><p>用一个保存按钮追踪 Sketch 图层、组件属性和共享样式在生成代码时的对应关系。</p><ul class="article-tags" aria-label="能力标签"><li>Sketch</li><li>设计系统</li><li>增量解析</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+        </ul>
+      </section>
+      <section class="article-category" aria-labelledby="category-3">
+        <h2 id="category-3">大型项目维护</h2>
+        <ul class="article-list">
+          <li><a class="article-row" href="industrial-map-renderer-migration/">
+            <div><h3>工业地图换渲染引擎时，怎样保住旧图</h3><p>沿着同一台设备点选、移动标签、保存和重开，验证工业地图切换渲染引擎后的兼容性。</p><ul class="article-tags" aria-label="能力标签"><li>Pixi.js</li><li>坐标转换</li><li>历史配置</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="open-tabs-after-deployment/">
+            <div><h3>运营平台发完新版，为什么旧标签页还会出错</h3><p>跟着旧标签页的一次详情请求，检查独立发版与回退后仍有人需要的静态资源。</p><ul class="article-tags" aria-label="能力标签"><li>微前端</li><li>静态资源</li><li>发布回退</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="factory-yield-reporting/">
+            <div><h3>同一批设备，合格率为什么对不上</h3><p>用两台设备的三条测试记录算清三种通过率，再看跨日复测会怎样改变报表。</p><ul class="article-tags" aria-label="能力标签"><li>生产测试</li><li>报表</li><li>指标口径</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+        </ul>
+      </section>
+      <section class="article-category" aria-labelledby="category-4">
+        <h2 id="category-4">小程序开发</h2>
+        <ul class="article-list">
+          <li><a class="article-row" href="miniapp-subpackage-entry-testing/">
+            <div><h3>微信商城分包后，首页和分享卡片该怎样验</h3><p>分别从商城首页和商品分享卡片进入，记录什么时候能浏览商品、什么时候能选中尺码。</p><ul class="article-tags" aria-label="能力标签"><li>微信小程序</li><li>分包</li><li>启动性能</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="miniapp-localized-campaigns/">
+            <div><h3>小程序切到英文以后，为什么活动横幅还是中文</h3><p>从一张仍显示中文的活动横幅，查到翻译文案、后台图片、页面缓存和落地页。</p><ul class="article-tags" aria-label="能力标签"><li>小程序</li><li>国际化</li><li>CMS</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+          <li><a class="article-row" href="multichannel-sku-selection/">
+            <div><h3>同一件商品，怎样在三个小程序里选对规格</h3><p>跟着一件外套核对分享卡片、各渠道的可售规格和订单，查出默认选项在哪一步换了颜色。</p><ul class="article-tags" aria-label="能力标签"><li>跨端电商</li><li>SKU</li><li>库存</li></ul></div>
+            <span class="article-arrow" aria-hidden="true">→</span>
+          </a></li>
+        </ul>
+      </section>
+      <section class="article-category" aria-labelledby="category-5">
+        <h2 id="category-5">Agent 架构与选型</h2>
         <ul class="article-list">
           <li><a class="article-row" href="agent-patterns/">
             <div><h3>从业务场景选择 Agent 的七种工程模式</h3><p>从任务步骤、验证方式和风险出发，比较七种可以组合的工程模式。</p><ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>工作流编排</li><li>多 Agent 协作</li></ul></div>
@@ -54,8 +117,8 @@
           </a></li>
         </ul>
       </section>
-      <section class="article-category" aria-labelledby="category-3">
-        <h2 id="category-3">记忆与知识检索</h2>
+      <section class="article-category" aria-labelledby="category-6">
+        <h2 id="category-6">记忆与知识检索</h2>
         <ul class="article-list">
           <li><a class="article-row" href="agent-memory/">
             <div><h3>Agent 记忆系统的分层设计与落地</h3><p>区分任务状态、会话记录和长期偏好，处理记忆写入、纠正与删除。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 记忆</li><li>状态管理</li><li>上下文管理</li></ul></div>
@@ -79,8 +142,8 @@
           </a></li>
         </ul>
       </section>
-      <section class="article-category" aria-labelledby="category-4">
-        <h2 id="category-4">Agent 运行与交付</h2>
+      <section class="article-category" aria-labelledby="category-7">
+        <h2 id="category-7">Agent 运行与交付</h2>
         <ul class="article-list">
           <li><a class="article-row" href="agent-release-evaluation/">
             <div><h3>Agent 评测怎样进发布流程</h3><p>把结果、工具轨迹和业务状态纳入评测，区分质量比较与发布门槛。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 评测</li><li>发布治理</li><li>质量保障</li></ul></div>
@@ -104,8 +167,8 @@
           </a></li>
         </ul>
       </section>
-      <section class="article-category" aria-labelledby="category-5">
-        <h2 id="category-5">工具与工程实践</h2>
+      <section class="article-category" aria-labelledby="category-8">
+        <h2 id="category-8">工具与工程实践</h2>
         <ul class="article-list">
           <li><a class="article-row" href="skill-mcp-selection/">
             <div><h3>多个 Skill 与 MCP 工具的选择和治理</h3><p>能力重叠时，按任务、权限和副作用选工具，并判断失败后能否切换。</p><ul class="article-tags" aria-label="能力标签"><li>工具集成</li><li>MCP</li><li>Agent Skills</li></ul></div>

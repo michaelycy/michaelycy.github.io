@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="从一张仍显示中文的活动横幅，查到翻译文案、后台图片、页面缓存和落地页。">
+  <title>小程序切到英文以后，为什么活动横幅还是中文 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">小程序开发</p>
+        <h1>小程序切到英文以后，为什么活动横幅还是中文</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-22">2026年11月22日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>小程序</li><li>国际化</li><li>CMS</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">横幅一直是中文，先看这几个字从哪来</a></li><li><a href="#section-2">横幅先变英文，又跳回中文</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>设想顾客把商城切到英文，导航和商品按钮都变了，首页横幅却还写着「会员专享」。点进去，活动说明已经是英文。屏幕上那四个字究竟来自翻译文件、运营填写的标题，还是设计师画进图片里的字？</p>
+<p>我参与过一款用 Taro 和 React 开发的零售小程序。我们把后台 CMS 的配置渲染成页面区块，让运营可以换活动内容，也用 i18next 处理界面和动态内容的语言切换。同一张活动卡片上，按钮、标题和图片可以分别更新。排查时先留意横幅是一直没变，还是已经变成英文、过了一会儿又跳回中文。</p>
+<h2 id="section-1">横幅一直是中文，先看这几个字从哪来</h2>
+<p>「返回」这样的固定按钮可以跟着应用的语言资源走。活动标题和说明由运营在 CMS 里维护，翻译文件里可能根本没有这个标题。图上已经排版好的中文，则需要另一份素材。可以让运营打开这条活动的英文预览，对照卡片的标题字段和图片原件。如果英文标题已经填好，单独打开原图仍然看得到「会员专享」，要换的就是那张图。</p>
+<p>有时卡片的标题和图片都对了，点进去才看到中文的使用条件。顺着同一条活动记录核对英文卡片指向哪个落地页、那一页取的是哪份说明。i18next 支持给缺少的翻译设定查找顺序。至于缺少英文素材时能否只展示文字，或者缺少活动条件时该不该开放入口，需要运营先定好这条活动的展示办法。<a href="https://www.i18next.com/principles/fallback">i18next 语言回退说明</a></p>
+<h2 id="section-2">横幅先变英文，又跳回中文</h2>
+<p>英文横幅出现过，至少说明这张卡拿到过英文内容。这时可以先保留两次首页请求，核对它们各自带的语言和返回顺序。如果较早发出的中文请求在切换后才写回首页，或者两种语言共用了一份首页缓存，后来的显示就可能退回中文。排查时把活动标识也带上，才能确认来回看到的是同一张卡。</p>
+<p>最后请运营预览同一活动。先用完整的英文内容从横幅点到说明，再临时拿掉英文图片，核对页面是否按这次活动的约定显示。若字在图上，打开英文素材就能找到要替换的原件。若横幅是英文、落地页仍是中文，运营可以沿着卡片的跳转目标找到那份活动说明。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

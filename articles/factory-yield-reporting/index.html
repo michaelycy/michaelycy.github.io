@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="用两台设备的三条测试记录算清三种通过率，再看跨日复测会怎样改变报表。">
+  <title>同一批设备，合格率为什么对不上 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">大型项目维护</p>
+        <h1>同一批设备，合格率为什么对不上</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-22">2026年11月22日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>生产测试</li><li>报表</li><li>指标口径</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">让每个数字都能指回几行记录</a></li><li><a href="#section-2">把复测移到第二天，重新算一次</a></li><li><a href="#section-3">一次口径修改要走到哪里</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>有两台设备。甲第一次测试失败，复测通过。乙一次通过。产线看最后能交付几台，两台都合格。测试同事逐条数记录，三次测试只有两次通过。只写一个「合格率」放在看板上，两边完全可能各自算对，却对不上同一个数。</p>
+<p>我参与过工厂配置与生产测试系统的开发，工作涉及测试任务、实时监控、报表和异常提醒，也需要和现场业务、运维联调。上面的两台设备是一个便于手算的例子。维护这类系统时，我会用这样的样本讨论一次指标改动会影响哪些人。</p>
+<h2 id="section-1">让每个数字都能指回几行记录</h2>
+<p>把这批设备的三条测试记录按发生顺序排开。</p>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>设备</th>
+<th>测试轮次</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>甲</td>
+<td>首测</td>
+<td>失败</td>
+</tr>
+<tr>
+<td>乙</td>
+<td>首测</td>
+<td>通过</td>
+</tr>
+<tr>
+<td>甲</td>
+<td>复测</td>
+<td>通过</td>
+</tr>
+</tbody>
+</table></div>
+<p>产线看每台设备最后一次测试的结果，甲和乙最终都通过，设备最终通过率是 <strong>2/2</strong>。测试负责人只取两台的首测，只有乙通过，设备首测通过率是 <strong>1/2</strong>。测试台每执行一轮就留一条记录，三轮里两轮通过，按测试轮次算的通过率是 <strong>2/3</strong>。报表和导出列写明采用哪一种，同事拿这三行就能自己复算。</p>
+<p>同样重要的是点进数字以后看什么。按设备的指标应能下钻到两台设备及各自采用的结果，按测试轮次的指标应能展开三条记录。总数和明细一起验，往往比只验小数点保留几位更早发现问题。</p>
+<h2 id="section-2">把复测移到第二天，重新算一次</h2>
+<p>把甲的复测改到次日早班。昨晚收班时，按当时最后一条记录，只有乙通过，算出来是 1/2。今天甲的复测也过了，同一批设备的当前结果变成 2/2。若日报每次打开都取设备的最新状态，昨天报表里的数字就会跟着今天这次复测变化。</p>
+<p>讨论改动时，我会请现场先选清楚问题。想查「昨晚交班时有几台合格」，就要保留截点，按当时已知的记录计算。想查「昨天那批设备现在有几台合格」，就按批次找设备，再看它们现在的结果。两张表服务的决定不同，标题里加上「截至交班」或「当前最终结果」，现场就少一次来回确认。</p>
+<h2 id="section-3">一次口径修改要走到哪里</h2>
+<p>假设决定把生产看板改为首测通过率。我会先找出消费旧字段的地方，逐一判断任务详情、趋势图、下载报表和告警规则是否也该切换。尤其要留意历史趋势。如果新旧口径从某天开始直接接在同一条线上，曲线的拐点可能只是定义发生了变化。可以回算可比区间，也可以把口径切换日标出来。</p>
+<p>联调时，我会把上面三行记录交给产线同事，请他从看板点到设备，再请测试同事从报表点到失败轮次。交给下一班的除了报表，还有这三行能手算的记录。换一个人接手，也能自己核对分子和分母。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>

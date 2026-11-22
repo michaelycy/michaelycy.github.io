@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="问卷换序、改名或合并选项后，在小程序和 H5 里追踪同一份未答完的问卷。">
+  <title>问卷改过以后，昨天答到一半的答案怎么办 · 母朝阳</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">微前端与前端基建</p>
+        <h1>问卷改过以后，昨天答到一半的答案怎么办</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-22">2026年11月22日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>低代码</li><li>问卷</li><li>草稿恢复</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">题目挪了一位，答案怎么跟过去</a></li><li><a href="#section-2">把地铁也算进去，昨天选的是哪一项</a></li><li><a href="#section-3">把昨天的草稿分别放回两端</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>假设昨天在手机上填问卷，第二题问「通常怎么出行」，我选了「公交」，填到一半就关了。今天运营把这题拖到第一题。接着填的时候，我希望昨天那一项还选着。可如果运营顺手把选项改成了「公共交通（含地铁）」，重新打开时，页面还能替我勾上吗？</p>
+<p>我参与过一套低代码问卷产品。管理端可以预览和局部保存大表单，配置通过 JSON Schema 交给用 Taro 开发的小程序和 H5 填写端，产品也支持中断后继续填写。编辑器里的预览能验证新题排在哪里。要知道昨天的答案去了哪里，得拿一份已经答过的草稿来试。</p>
+<h2 id="section-1">题目挪了一位，答案怎么跟过去</h2>
+<p>拿昨天的选择举例。假如草稿只记下「第二题、第一项」，把出行题挪到页首以后，第二题可能已经在问年龄。按位置读回旧答案，两个字段即使都是合法数字，勾中的也会是另一道题。</p>
+<p>换一种表示，可以把草稿里的这条回答简写成下面这样。字段名只用来说明例子。</p>
+<pre><code class="language-json">{ &quot;questionId&quot;: &quot;travel_mode&quot;, &quot;optionId&quot;: &quot;bus&quot; }
+</code></pre>
+<p>恢复时先在问卷配置里找出行题，再在这道题里找公交选项。只改顺序，两个标识都能对上。如果只是把「公交」写全成「公交车」，产品也确认两者含义相同，页面就可以用新文案显示原来的选择。JSON Schema 可以检查这两个标识的字段和类型，选项的意思有没有变化，还要看这次编辑改了什么。<a href="https://json-schema.org/understanding-json-schema/reference/object">JSON Schema 对象约束</a></p>
+<h2 id="section-2">把地铁也算进去，昨天选的是哪一项</h2>
+<p>假设运营把「公交」和「地铁」合并为「公共交通」。昨天勾「公交」的人确实选过公交，但原问卷能区分公交和地铁，新问卷只剩一项。即使用回同一个选项标识，后面做统计的人也需要知道，这条回答当时面对的是哪组选择。</p>
+<p>这里要先选定进行中的问卷用哪一版。若允许按开始时的版本答完，草稿需要能找到那一版的题目和选项。若要求都按新版提交，就要约定哪些旧答案能映射过去，哪些需要回到题目请填写人重新确认。选项已经删掉、又没有对应项时，页面应该能指出要重答哪一题。否则填写人可能从头翻一遍才找到卡住提交的地方。</p>
+<h2 id="section-3">把昨天的草稿分别放回两端</h2>
+<p>验收时可以给小程序和 H5 各准备一份内容相同的旧草稿，都是选了公交、下一题还空着。先只调整题目顺序并保存，在两端各自恢复，检查勾选是否还跟着出行题，答完后再看提交记录里的题目标识。这样一次就能发现界面显示正确、提交时却仍按旧序号取值的问题。</p>
+<p>接着让运营发布合并过选项的新问卷，再从先前保留的旧草稿副本继续填写。约定沿用旧版，就看两端能否展示原来的选择并按旧版提交。约定迁移，就核对提交结果里这个值的来历。它可能是按约定从旧答案换算来的「公共交通」，也可能是页面提示以后，填写人亲手重选的一项。翻到昨天那份草稿，应该能交代清楚今天这项答案是怎么来的。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+</body>
+</html>
