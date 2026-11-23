@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedOn": "2026-11-20",
+  "updatedOn": "2026-11-23",
   "profile": {
     "name": "母朝阳",
     "github": "https://github.com/michaelycy",
@@ -26,7 +26,8 @@
         "survey-platform",
         "document-quality",
         "corporate-portal",
-        "bilingual-portal"
+        "bilingual-portal",
+        "feeding-diary"
       ],
       "featuredIds": [
         "operations-microfrontend",
@@ -74,7 +75,9 @@
         "multichannel-commerce",
         "document-quality",
         "corporate-portal",
-        "bilingual-portal"
+        "bilingual-portal",
+        "feeding-diary",
+        "creator-workbench"
       ],
       "featuredIds": [
         "document-translation",
@@ -92,7 +95,8 @@
       ],
       "projectIds": [
         "document-translation",
-        "agent-platform"
+        "agent-platform",
+        "creator-workbench"
       ],
       "featuredIds": [
         "agent-platform",
@@ -104,6 +108,15 @@
   "employment": [
     {
       "id": "career-1",
+      "name": "独立开发者",
+      "role": "全栈开发",
+      "period": "2026.10-至今",
+      "projectIds": [
+        "creator-workbench"
+      ]
+    },
+    {
+      "id": "career-2",
       "name": "上海比孚信息科技有限公司",
       "role": "全栈开发",
       "period": "2026.06-2026.10",
@@ -113,42 +126,44 @@
       ]
     },
     {
-      "id": "career-2",
+      "id": "career-3",
       "name": "独立开发者",
       "role": "全栈开发",
       "period": "2025.11-2026.05",
-      "projectIds": []
+      "projectIds": [
+        "feeding-diary"
+      ]
     },
     {
-      "id": "career-3",
+      "id": "career-4",
       "name": "奇利匙信息技术（上海）有限公司",
       "role": "大前端 Leader",
       "period": "2022.11-2025.09",
       "projectIds": []
     },
     {
-      "id": "career-4",
+      "id": "career-5",
       "name": "上海快仓智能科技有限公司",
       "role": "前端 Leader",
       "period": "2021.12-2022.11",
       "projectIds": []
     },
     {
-      "id": "career-5",
+      "id": "career-6",
       "name": "上海易恒健康科技有限公司",
       "role": "前端 Leader",
       "period": "2021.04-2021.12",
       "projectIds": []
     },
     {
-      "id": "career-6",
+      "id": "career-7",
       "name": "杭州数云信息技术有限公司",
       "role": "高级前端开发工程师",
       "period": "2014.08-2021.04",
       "projectIds": []
     },
     {
-      "id": "career-7",
+      "id": "career-8",
       "name": "南京安讯科技有限责任公司",
       "role": ".NET 开发工程师",
       "period": "2012.06-2014.08",
@@ -889,7 +904,64 @@
         }
       ],
       "relatedProjectIds": []
+    },
+    {
+      "id": "feeding-diary",
+      "name": "转奶助手",
+      "background": "家长可在微信小程序中制定转奶计划，查看每日配方，记录每次喂养并回顾每日奶量。",
+      "role": "独立开发者",
+      "period": "2025.11-2026.05",
+      "periodContext": "相关任职期间",
+      "completeness": "detailed",
+      "stack": [
+        "Taro 4",
+        "React 18",
+        "TypeScript",
+        "PostgreSQL"
+      ],
+      "responsibilities": [
+        "把模板展开成逐日计划，保存创建时的模板版本。",
+        "在快捷记录中按喂养时间匹配配方，也支持补记计划外的一餐。",
+        "用 PostgreSQL 约束同一宝宝最多只有一份未结束的计划，并按账户限制记录的读写。"
+      ],
+      "cases": [
+        {
+          "challenge": "夜间喂养跨过零点后，记录仍可能属于前一个喂养日。",
+          "approach": "按凌晨四点划分喂养日，再匹配计划中的配方。用分界点前后的测试用例核对记录归属。"
+        }
+      ],
+      "relatedProjectIds": []
+    },
+    {
+      "id": "creator-workbench",
+      "name": "UNO 创作资源库",
+      "background": "创作者可以选用模板和技能，保存个人版本，引用知识摘录或参考图片生成文本和图片。",
+      "role": "独立开发者",
+      "period": "2026.10-至今",
+      "periodContext": "",
+      "completeness": "detailed",
+      "stack": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Python",
+        "FastAPI",
+        "SQLAlchemy",
+        "PostgreSQL"
+      ],
+      "responsibilities": [
+        "在创作工作台中带入模板版本、参考图和知识摘录，供用户调整后提交。",
+        "确认报价后预留积分并异步调用模型，文本任务按实际用量结算，扣费以确认报价为上限。",
+        "付款确认后发放资源使用权，按订单来源去重授权。"
+      ],
+      "cases": [
+        {
+          "challenge": "生成请求已提交但响应丢失时，直接重试可能重复创建任务并预留积分。",
+          "approach": "用账户和请求号找回原任务，核对报价是否一致。新建任务与预留积分在同一事务中提交。"
+        }
+      ],
+      "relatedProjectIds": []
     }
   ],
-  "version": "e9558a977539"
+  "version": "6ed0f393f76b"
 }
