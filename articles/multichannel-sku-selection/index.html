@@ -100,6 +100,73 @@
           try { localStorage.setItem('mblog-theme', next); } catch (e) {}
         });
       }
+      var topicMenu = document.querySelector('.article-topic-more');
+      if (topicMenu) {
+        const topicNav = topicMenu.closest('nav');
+        const tabs = topicNav.querySelector('.article-topic-tabs');
+        const items = [...tabs.children];
+        const allTopics = items[0];
+        const currentLink = tabs.querySelector('[aria-current]');
+        const currentTopic = currentLink.parentElement;
+        const overflowList = topicMenu.querySelector('ul');
+        const moreToggle = topicMenu.querySelector('summary');
+        let lastWidth;
+
+        function fitTopicTabs() {
+          const width = topicNav.getBoundingClientRect().width;
+          if (!width) return;
+          lastWidth = width;
+          const focused = document.activeElement;
+          const restoreFocus = topicNav.contains(focused);
+
+          // Measure each topic in the tab strip, where it has its natural width.
+          tabs.append(...items);
+          topicMenu.hidden = false;
+          const gap = parseFloat(getComputedStyle(tabs).columnGap);
+          const widths = items.map(item => item.getBoundingClientRect().width);
+          const totalWidth = widths.reduce((sum, itemWidth) => sum + itemWidth, 0) + gap * (items.length - 1);
+          const overflow = [];
+
+          if (totalWidth > width) {
+            const available = width - topicMenu.getBoundingClientRect().width - parseFloat(getComputedStyle(topicNav).columnGap);
+            let used = widths[0];
+            if (currentTopic !== allTopics) used += gap + widths[items.indexOf(currentTopic)];
+            items.forEach((item, index) => {
+              if (item === allTopics || item === currentTopic) return;
+              const next = used + gap + widths[index];
+              if (next <= available) used = next;
+              else overflow.push(item);
+            });
+          }
+
+          overflowList.replaceChildren(...overflow);
+          topicMenu.hidden = overflow.length === 0;
+          if (topicMenu.hidden) topicMenu.open = false;
+          if (restoreFocus) {
+            const target = topicMenu.contains(focused) && !topicMenu.open
+              ? (topicMenu.hidden ? currentLink : moreToggle)
+              : focused;
+            target.focus({ preventScroll: true });
+          }
+        }
+
+        fitTopicTabs();
+        new ResizeObserver(function () {
+          if (topicNav.getBoundingClientRect().width !== lastWidth) fitTopicTabs();
+        }).observe(topicNav);
+        document.fonts?.ready.then(fitTopicTabs);
+
+        function closeTopicMenuOutside(event) {
+          if (topicMenu.open && !topicMenu.contains(event.target)) topicMenu.open = false;
+        }
+        document.addEventListener('click', closeTopicMenuOutside);
+        document.addEventListener('focusin', closeTopicMenuOutside);
+        topicMenu.addEventListener('keydown', function (event) {
+          if (event.key !== 'Escape' || !topicMenu.open) return;
+          topicMenu.open = false;
+          moreToggle.focus();
+        });
+      }
     })();
   </script>
 </body>

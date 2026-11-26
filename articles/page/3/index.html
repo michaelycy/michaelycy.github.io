@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="母朝阳的 Agent 系统、知识检索与软件工程文章。">
+  <title>技术文章 · 第 3 页 · 母朝阳</title>
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('mblog-theme'); } catch (e) {}
+      var theme = saved === 'light' || saved === 'dark' ? saved
+        : (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', theme === 'light' ? '#f3f6f4' : '#0d1115');
+    })();
+  </script>
+  <link rel="stylesheet" href="../../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../../#articles">返回简历</a><a href="../../">文章目录</a><button id="theme-toggle" class="theme-toggle" aria-label="切换浅色/深色主题"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button></nav>
+    </header>
+    <main id="article-main" tabindex="-1"><div class="article-heading"><h1>技术文章</h1><p>记录 Agent 系统设计、知识检索与软件工程中的取舍。</p></div>
+      <nav class="article-topic-filter" aria-label="按主题筛选">
+    <ul class="article-topic-tabs"><li><a href="../../" aria-current="true">全部主题</a></li><li><a href="../../topic/project-practice/">项目实践 <span>5</span></a></li><li><a href="../../topic/frontend-infrastructure/">微前端与前端基建 <span>6</span></a></li><li><a href="../../topic/project-maintenance/">大型项目维护 <span>3</span></a></li><li><a href="../../topic/miniapp-development/">小程序开发 <span>3</span></a></li><li><a href="../../topic/agent-architecture/">Agent 架构与选型 <span>3</span></a></li><li><a href="../../topic/memory-retrieval/">记忆与知识检索 <span>5</span></a></li><li><a href="../../topic/agent-delivery/">Agent 运行与交付 <span>5</span></a></li><li><a href="../../topic/engineering-tools/">工具与工程实践 <span>2</span></a></li></ul>
+    <details class="article-topic-more" hidden>
+    <summary aria-label="更多主题">更多</summary>
+    <ul></ul>
+  </details>
+  </nav>
+      <div class="article-index">
+        <p class="article-index-count">共 32 篇</p>
+        <ul class="article-list">
+    <li>
+      <a class="article-row" href="../../scaffold-project-upgrades/">
+        <div><h2>脚手架生成第一个项目以后，怎么升级</h2><p class="article-row-date"><time datetime="2024-02-02">2024年2月2日</time></p><p>沿着旧项目的订单路由检验一次构建修复，区分模板复制的文件和可单独升级的共享脚本。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>脚手架</li><li>构建工具</li><li>依赖升级</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../factory-yield-reporting/">
+        <div><h2>同一批设备，合格率为什么对不上</h2><p class="article-row-date"><time datetime="2022-10-28">2022年10月28日</time></p><p>用两台设备的三条测试记录算清三种通过率，再看跨日复测会怎样改变报表。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>生产测试</li><li>报表</li><li>指标口径</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../industrial-map-renderer-migration/">
+        <div><h2>工业地图换渲染引擎时，怎样保住旧图</h2><p class="article-row-date"><time datetime="2022-10-14">2022年10月14日</time></p><p>沿着同一台设备点选、移动标签、保存和重开，验证工业地图切换渲染引擎后的兼容性。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Pixi.js</li><li>坐标转换</li><li>历史配置</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../survey-draft-compatibility/">
+        <div><h2>问卷改过以后，昨天答到一半的答案怎么办</h2><p class="article-row-date"><time datetime="2021-12-17">2021年12月17日</time></p><p>问卷换序、改名或合并选项后，在小程序和 H5 里追踪同一份未答完的问卷。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>低代码</li><li>问卷</li><li>草稿恢复</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../resizable-table-columns/">
+        <div><h2>表头拖宽以后，表格内容为什么没跟上</h2><p class="article-row-date"><time datetime="2021-04-23">2021年4月23日</time></p><p>跟着一次从 160 到 220 像素的拖动，定位表头与正文在哪一步读到了不同的宽度。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>React</li><li>表格组件</li><li>列宽同步</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../microfrontend-local-host/">
+        <div><h2>微前端子应用怎样单独跑起来</h2><p class="article-row-date"><time datetime="2021-04-09">2021年4月9日</time></p><p>从本地会员详情页接回真实基座，核对组织上下文、首次查询和监听清理。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>微前端</li><li>single-spa</li><li>本地联调</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../dashboard-widget-instances/">
+        <div><h2>同一张卡片怎样在微前端看板里出现两次</h2><p class="article-row-date"><time datetime="2021-02-05">2021年2月5日</time></p><p>在同一看板放两张会员卡，检查换位、刷新和卸载后，筛选条件与请求是否跟着正确的实例。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>微前端</li><li>看板</li><li>实例状态</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../sketch-component-mapping/">
+        <div><h2>Sketch 设计稿怎样映射到已有组件</h2><p class="article-row-date"><time datetime="2020-06-19">2020年6月19日</time></p><p>用一个保存按钮追踪 Sketch 图层、组件属性和共享样式在生成代码时的对应关系。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Sketch</li><li>设计系统</li><li>增量解析</li></ul>
+    </li>
+  </ul>
+        <nav class="article-pagination" aria-label="文章分页">
+    <a href="../../page/2/" rel="prev">上一页</a>
+    <div class="article-page-numbers"><a href="../../" aria-label="第 1 页">1</a><a href="../../page/2/" aria-label="第 2 页">2</a><span aria-current="page" aria-label="第 3 页">3</span></div>
+    <span class="article-page-position">第 3 / 3 页</span>
+    <span class="article-page-unavailable">下一页</span>
+  </nav>
+        
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../../#articles">返回简历 ↑</a></footer>
+  </div>
+  <script>
+    (function () {
+      var MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 14.2A8.6 8.6 0 0 1 9.8 3.4a8.6 8.6 0 1 0 10.8 10.8Z"/></svg>';
+      var SUN = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>';
+      var root = document.documentElement;
+      var button = document.getElementById('theme-toggle');
+      function current() { return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+      function icon(theme) { return theme === 'light' ? MOON : SUN; }
+      function meta(theme) {
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute('content', theme === 'light' ? '#f3f6f4' : '#0d1115');
+      }
+      function apply(theme) {
+        if (theme === 'light') root.setAttribute('data-theme', 'light');
+        else root.removeAttribute('data-theme');
+        meta(theme);
+        if (button) button.innerHTML = icon(theme);
+      }
+      if (button) {
+        button.innerHTML = icon(current());
+        button.addEventListener('click', function () {
+          var next = current() === 'light' ? 'dark' : 'light';
+          apply(next);
+          try { localStorage.setItem('mblog-theme', next); } catch (e) {}
+        });
+      }
+      var topicMenu = document.querySelector('.article-topic-more');
+      if (topicMenu) {
+        const topicNav = topicMenu.closest('nav');
+        const tabs = topicNav.querySelector('.article-topic-tabs');
+        const items = [...tabs.children];
+        const allTopics = items[0];
+        const currentLink = tabs.querySelector('[aria-current]');
+        const currentTopic = currentLink.parentElement;
+        const overflowList = topicMenu.querySelector('ul');
+        const moreToggle = topicMenu.querySelector('summary');
+        let lastWidth;
+
+        function fitTopicTabs() {
+          const width = topicNav.getBoundingClientRect().width;
+          if (!width) return;
+          lastWidth = width;
+          const focused = document.activeElement;
+          const restoreFocus = topicNav.contains(focused);
+
+          // Measure each topic in the tab strip, where it has its natural width.
+          tabs.append(...items);
+          topicMenu.hidden = false;
+          const gap = parseFloat(getComputedStyle(tabs).columnGap);
+          const widths = items.map(item => item.getBoundingClientRect().width);
+          const totalWidth = widths.reduce((sum, itemWidth) => sum + itemWidth, 0) + gap * (items.length - 1);
+          const overflow = [];
+
+          if (totalWidth > width) {
+            const available = width - topicMenu.getBoundingClientRect().width - parseFloat(getComputedStyle(topicNav).columnGap);
+            let used = widths[0];
+            if (currentTopic !== allTopics) used += gap + widths[items.indexOf(currentTopic)];
+            items.forEach((item, index) => {
+              if (item === allTopics || item === currentTopic) return;
+              const next = used + gap + widths[index];
+              if (next <= available) used = next;
+              else overflow.push(item);
+            });
+          }
+
+          overflowList.replaceChildren(...overflow);
+          topicMenu.hidden = overflow.length === 0;
+          if (topicMenu.hidden) topicMenu.open = false;
+          if (restoreFocus) {
+            const target = topicMenu.contains(focused) && !topicMenu.open
+              ? (topicMenu.hidden ? currentLink : moreToggle)
+              : focused;
+            target.focus({ preventScroll: true });
+          }
+        }
+
+        fitTopicTabs();
+        new ResizeObserver(function () {
+          if (topicNav.getBoundingClientRect().width !== lastWidth) fitTopicTabs();
+        }).observe(topicNav);
+        document.fonts?.ready.then(fitTopicTabs);
+
+        function closeTopicMenuOutside(event) {
+          if (topicMenu.open && !topicMenu.contains(event.target)) topicMenu.open = false;
+        }
+        document.addEventListener('click', closeTopicMenuOutside);
+        document.addEventListener('focusin', closeTopicMenuOutside);
+        topicMenu.addEventListener('keydown', function (event) {
+          if (event.key !== 'Escape' || !topicMenu.open) return;
+          topicMenu.open = false;
+          moreToggle.focus();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

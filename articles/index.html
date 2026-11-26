@@ -27,142 +27,97 @@
       <nav aria-label="主导航"><a href="../#articles">返回简历</a><a href="./">文章目录</a><button id="theme-toggle" class="theme-toggle" aria-label="切换浅色/深色主题"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button></nav>
     </header>
     <main id="article-main" tabindex="-1"><div class="article-heading"><h1>技术文章</h1><p>记录 Agent 系统设计、知识检索与软件工程中的取舍。</p></div>
-      <section class="article-category" aria-labelledby="category-1">
-        <h2 id="category-1">项目实践</h2>
+      <nav class="article-topic-filter" aria-label="按主题筛选">
+    <ul class="article-topic-tabs"><li><a href="./" aria-current="true">全部主题</a></li><li><a href="topic/project-practice/">项目实践 <span>5</span></a></li><li><a href="topic/frontend-infrastructure/">微前端与前端基建 <span>6</span></a></li><li><a href="topic/project-maintenance/">大型项目维护 <span>3</span></a></li><li><a href="topic/miniapp-development/">小程序开发 <span>3</span></a></li><li><a href="topic/agent-architecture/">Agent 架构与选型 <span>3</span></a></li><li><a href="topic/memory-retrieval/">记忆与知识检索 <span>5</span></a></li><li><a href="topic/agent-delivery/">Agent 运行与交付 <span>5</span></a></li><li><a href="topic/engineering-tools/">工具与工程实践 <span>2</span></a></li></ul>
+    <details class="article-topic-more" hidden>
+    <summary aria-label="更多主题">更多</summary>
+    <ul></ul>
+  </details>
+  </nav>
+      <div class="article-index">
+        <p class="article-index-count">共 32 篇</p>
         <ul class="article-list">
-          <li><a class="article-row" href="agent-answer-evaluation/">
-            <div><h3>Agent 答对了多少题，怎样从一次评测里看出来？</h3><p class="article-row-date"><time datetime="2026-11-02">2026年11月2日</time></p><p>用一组酒店超标预订题，追踪样本如何进入实验、同一份回答怎样判分，以及平均分上升后仍要复核哪一道题。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 评测</li><li>评测集</li><li>模型裁判</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="document-translation-recovery/">
-            <div><h3>文档翻译任务怎样在刷新和失败后继续</h3><p class="article-row-date"><time datetime="2026-10-08">2026年10月8日</time></p><p>从扫描 PDF 出发，讲翻译任务如何分步执行、补译和恢复进度。</p><ul class="article-tags" aria-label="能力标签"><li>文档翻译</li><li>异步任务</li><li>故障恢复</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="pdf-translation-adjustment/">
-            <div><h3>PDF 译文校准的坐标转换与回写</h3><p class="article-row-date"><time datetime="2026-09-08">2026年9月8日</time></p><p>从一次拖动看 PDF、OCR 和编辑器的坐标如何对齐，修改怎样写回译文。</p><ul class="article-tags" aria-label="能力标签"><li>PDF 编辑</li><li>坐标变换</li><li>长文档渲染</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="agent-workflow-publishing/">
-            <div><h3>Agent 工作流画布的草稿保存与发布</h3><p class="article-row-date"><time datetime="2026-09-16">2026年9月16日</time></p><p>连线、改参数和发布连着发生时，怎样保存草稿并核对发布版本。</p><ul class="article-tags" aria-label="能力标签"><li>可视化工作流</li><li>状态管理</li><li>版本发布</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="agent-chat-sdk/">
-            <div><h3>一套 Chat SDK 怎样同时服务门户和调试窗口</h3><p class="article-row-date"><time datetime="2026-09-04">2026年9月4日</time></p><p>门户、调试和回放共享会话逻辑，分别管理实时事件和实例状态。</p><ul class="article-tags" aria-label="能力标签"><li>Chat SDK</li><li>实时通信</li><li>组件架构</li></ul></div>
-          </a></li>
-        </ul>
-      </section>
-      <section class="article-category" aria-labelledby="category-2">
-        <h2 id="category-2">微前端与前端基建</h2>
-        <ul class="article-list">
-          <li><a class="article-row" href="microfrontend-local-host/">
-            <div><h3>微前端子应用怎样单独跑起来</h3><p class="article-row-date"><time datetime="2021-04-09">2021年4月9日</time></p><p>从本地会员详情页接回真实基座，核对组织上下文、首次查询和监听清理。</p><ul class="article-tags" aria-label="能力标签"><li>微前端</li><li>single-spa</li><li>本地联调</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="dashboard-widget-instances/">
-            <div><h3>同一张卡片怎样在微前端看板里出现两次</h3><p class="article-row-date"><time datetime="2021-02-05">2021年2月5日</time></p><p>在同一看板放两张会员卡，检查换位、刷新和卸载后，筛选条件与请求是否跟着正确的实例。</p><ul class="article-tags" aria-label="能力标签"><li>微前端</li><li>看板</li><li>实例状态</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="resizable-table-columns/">
-            <div><h3>表头拖宽以后，表格内容为什么没跟上</h3><p class="article-row-date"><time datetime="2021-04-23">2021年4月23日</time></p><p>跟着一次从 160 到 220 像素的拖动，定位表头与正文在哪一步读到了不同的宽度。</p><ul class="article-tags" aria-label="能力标签"><li>React</li><li>表格组件</li><li>列宽同步</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="scaffold-project-upgrades/">
-            <div><h3>脚手架生成第一个项目以后，怎么升级</h3><p class="article-row-date"><time datetime="2024-02-02">2024年2月2日</time></p><p>沿着旧项目的订单路由检验一次构建修复，区分模板复制的文件和可单独升级的共享脚本。</p><ul class="article-tags" aria-label="能力标签"><li>脚手架</li><li>构建工具</li><li>依赖升级</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="survey-draft-compatibility/">
-            <div><h3>问卷改过以后，昨天答到一半的答案怎么办</h3><p class="article-row-date"><time datetime="2021-12-17">2021年12月17日</time></p><p>问卷换序、改名或合并选项后，在小程序和 H5 里追踪同一份未答完的问卷。</p><ul class="article-tags" aria-label="能力标签"><li>低代码</li><li>问卷</li><li>草稿恢复</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="sketch-component-mapping/">
-            <div><h3>Sketch 设计稿怎样映射到已有组件</h3><p class="article-row-date"><time datetime="2020-06-19">2020年6月19日</time></p><p>用一个保存按钮追踪 Sketch 图层、组件属性和共享样式在生成代码时的对应关系。</p><ul class="article-tags" aria-label="能力标签"><li>Sketch</li><li>设计系统</li><li>增量解析</li></ul></div>
-          </a></li>
-        </ul>
-      </section>
-      <section class="article-category" aria-labelledby="category-3">
-        <h2 id="category-3">大型项目维护</h2>
-        <ul class="article-list">
-          <li><a class="article-row" href="industrial-map-renderer-migration/">
-            <div><h3>工业地图换渲染引擎时，怎样保住旧图</h3><p class="article-row-date"><time datetime="2022-10-14">2022年10月14日</time></p><p>沿着同一台设备点选、移动标签、保存和重开，验证工业地图切换渲染引擎后的兼容性。</p><ul class="article-tags" aria-label="能力标签"><li>Pixi.js</li><li>坐标转换</li><li>历史配置</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="open-tabs-after-deployment/">
-            <div><h3>运营平台发完新版，为什么旧标签页还会出错</h3><p class="article-row-date"><time datetime="2024-02-23">2024年2月23日</time></p><p>跟着旧标签页的一次详情请求，检查独立发版与回退后仍有人需要的静态资源。</p><ul class="article-tags" aria-label="能力标签"><li>微前端</li><li>静态资源</li><li>发布回退</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="factory-yield-reporting/">
-            <div><h3>同一批设备，合格率为什么对不上</h3><p class="article-row-date"><time datetime="2022-10-28">2022年10月28日</time></p><p>用两台设备的三条测试记录算清三种通过率，再看跨日复测会怎样改变报表。</p><ul class="article-tags" aria-label="能力标签"><li>生产测试</li><li>报表</li><li>指标口径</li></ul></div>
-          </a></li>
-        </ul>
-      </section>
-      <section class="article-category" aria-labelledby="category-4">
-        <h2 id="category-4">小程序开发</h2>
-        <ul class="article-list">
-          <li><a class="article-row" href="miniapp-subpackage-entry-testing/">
-            <div><h3>微信商城分包后，首页和分享卡片该怎样验</h3><p class="article-row-date"><time datetime="2025-03-21">2025年3月21日</time></p><p>分别从商城首页和商品分享卡片进入，记录什么时候能浏览商品、什么时候能选中尺码。</p><ul class="article-tags" aria-label="能力标签"><li>微信小程序</li><li>分包</li><li>启动性能</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="miniapp-localized-campaigns/">
-            <div><h3>小程序切到英文以后，为什么活动横幅还是中文</h3><p class="article-row-date"><time datetime="2025-12-12">2025年12月12日</time></p><p>从一张仍显示中文的活动横幅，查到翻译文案、后台图片、页面缓存和落地页。</p><ul class="article-tags" aria-label="能力标签"><li>小程序</li><li>国际化</li><li>CMS</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="multichannel-sku-selection/">
-            <div><h3>同一件商品，怎样在三个小程序里选对规格</h3><p class="article-row-date"><time datetime="2025-06-20">2025年6月20日</time></p><p>跟着一件外套核对分享卡片、各渠道的可售规格和订单，查出默认选项在哪一步换了颜色。</p><ul class="article-tags" aria-label="能力标签"><li>跨端电商</li><li>SKU</li><li>库存</li></ul></div>
-          </a></li>
-        </ul>
-      </section>
-      <section class="article-category" aria-labelledby="category-5">
-        <h2 id="category-5">Agent 架构与选型</h2>
-        <ul class="article-list">
-          <li><a class="article-row" href="agent-patterns/">
-            <div><h3>从业务场景选择 Agent 的七种工程模式</h3><p class="article-row-date"><time datetime="2026-11-04">2026年11月4日</time></p><p>从任务步骤、验证方式和风险出发，比较七种可以组合的工程模式。</p><ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>工作流编排</li><li>多 Agent 协作</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="enterprise-agent-architecture/">
-            <div><h3>企业级 Agent 系统的架构与运行治理</h3><p class="article-row-date"><time datetime="2026-11-12">2026年11月12日</time></p><p>用差旅助手串起任务受理、审批、幂等提交和故障恢复。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 架构</li><li>工作流编排</li><li>故障恢复</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="langchain-vs-langgraph/">
-            <div><h3>LangChain 与 LangGraph 的区别和选型</h3><p class="article-row-date"><time datetime="2026-06-08">2026年6月8日</time></p><p>用工具调用和审批流程说明两个框架各管哪一层、什么时候用。</p><ul class="article-tags" aria-label="能力标签"><li>技术选型</li><li>LangChain</li><li>LangGraph</li></ul></div>
-          </a></li>
-        </ul>
-      </section>
-      <section class="article-category" aria-labelledby="category-6">
-        <h2 id="category-6">记忆与知识检索</h2>
-        <ul class="article-list">
-          <li><a class="article-row" href="agent-memory/">
-            <div><h3>Agent 记忆系统的分层设计与落地</h3><p class="article-row-date"><time datetime="2026-07-01">2026年7月1日</time></p><p>区分任务状态、会话记录和长期偏好，处理记忆写入、纠正与删除。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 记忆</li><li>状态管理</li><li>上下文管理</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="knowledge-base-integration/">
-            <div><h3>知识库与 Agent 的高效协作</h3><p class="article-row-date"><time datetime="2026-07-12">2026年7月12日</time></p><p>从文档入库到回答引用，梳理检索、权限与证据校验。</p><ul class="article-tags" aria-label="能力标签"><li>RAG</li><li>混合检索</li><li>知识库治理</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="semantic-retrieval/">
-            <div><h3>Agent 语义理解与检索链路的设计</h3><p class="article-row-date"><time datetime="2026-07-20">2026年7月20日</time></p><p>把口语问题转成可校验的查询，保留编号、时间和业务条件。</p><ul class="article-tags" aria-label="能力标签"><li>语义检索</li><li>查询改写</li><li>混合检索</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="knowledge-conflicts/">
-            <div><h3>知识库多文档冲突的识别与处理</h3><p class="article-row-date"><time datetime="2026-07-24">2026年7月24日</time></p><p>制度说法不一致时，按适用条件和正式版本裁决，无法确认就转人工。</p><ul class="article-tags" aria-label="能力标签"><li>知识库治理</li><li>规则裁决</li><li>权限控制</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="agent-context-assembly/">
-            <div><h3>Agent 这一轮该带哪些上下文</h3><p class="article-row-date"><time datetime="2026-07-28">2026年7月28日</time></p><p>以差旅制度问答为例，处理历史日期、撤权和输入预算。</p><ul class="article-tags" aria-label="能力标签"><li>上下文管理</li><li>状态管理</li><li>权限控制</li></ul></div>
-          </a></li>
-        </ul>
-      </section>
-      <section class="article-category" aria-labelledby="category-7">
-        <h2 id="category-7">Agent 运行与交付</h2>
-        <ul class="article-list">
-          <li><a class="article-row" href="agent-release-evaluation/">
-            <div><h3>Agent 评测怎样进发布流程</h3><p class="article-row-date"><time datetime="2026-07-08">2026年7月8日</time></p><p>把结果、工具轨迹和业务状态纳入评测，区分质量比较与发布门槛。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 评测</li><li>发布治理</li><li>质量保障</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="agent-debugging-replay/">
-            <div><h3>Agent 故障怎样定位和安全复跑</h3><p class="article-row-date"><time datetime="2026-08-02">2026年8月2日</time></p><p>从一次提交超时出发，追踪任务状态并验证复跑是否会重复写入。</p><ul class="article-tags" aria-label="能力标签"><li>可观测性</li><li>故障恢复</li><li>幂等</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="agent-cost-control/">
-            <div><h3>Agent 调用成本怎样记账和限额</h3><p class="article-row-date"><time datetime="2026-08-08">2026年8月8日</time></p><p>按任务汇总调用费用，处理并发额度预占、超时核对和降本评估。</p><ul class="article-tags" aria-label="能力标签"><li>成本控制</li><li>并发控制</li><li>模型调用</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="agent-prompt-injection/">
-            <div><h3>Agent 提示注入怎样限制影响</h3><p class="article-row-date"><time datetime="2026-08-13">2026年8月13日</time></p><p>用一份带恶意指令的附件，说明读取、修改与外发各自的权限边界。</p><ul class="article-tags" aria-label="能力标签"><li>Agent 安全</li><li>提示注入</li><li>权限控制</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="agent-pilot-rollout/">
-            <div><h3>Agent 功能怎样试点和放量</h3><p class="article-row-date"><time datetime="2026-08-13">2026年8月13日</time></p><p>从客服草稿试点出发，安排离线评估、影子对照、灰度与人工接管。</p><ul class="article-tags" aria-label="能力标签"><li>灰度发布</li><li>技术选型</li><li>发布治理</li></ul></div>
-          </a></li>
-        </ul>
-      </section>
-      <section class="article-category" aria-labelledby="category-8">
-        <h2 id="category-8">工具与工程实践</h2>
-        <ul class="article-list">
-          <li><a class="article-row" href="skill-mcp-selection/">
-            <div><h3>多个 Skill 与 MCP 工具的选择和治理</h3><p class="article-row-date"><time datetime="2026-08-16">2026年8月16日</time></p><p>能力重叠时，按任务、权限和副作用选工具，并判断失败后能否切换。</p><ul class="article-tags" aria-label="能力标签"><li>工具集成</li><li>MCP</li><li>Agent Skills</li></ul></div>
-          </a></li>
-          <li><a class="article-row" href="vibe-coding-quality/">
-            <div><h3>Vibe Coding 的代码质量与长期维护</h3><p class="article-row-date"><time datetime="2026-11-08">2026年11月8日</time></p><p>从验收条件到评审、测试和发布，把 AI 生成的代码纳入日常维护。</p><ul class="article-tags" aria-label="能力标签"><li>AI 辅助开发</li><li>代码评审</li><li>质量保障</li></ul></div>
-          </a></li>
-        </ul>
-      </section></main>
+    <li>
+      <a class="article-row" href="enterprise-agent-architecture/">
+        <div><h2>企业级 Agent 系统的架构与运行治理</h2><p class="article-row-date"><time datetime="2026-11-12">2026年11月12日</time></p><p>用差旅助手串起任务受理、审批、幂等提交和故障恢复。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Agent 架构</li><li>工作流编排</li><li>故障恢复</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="vibe-coding-quality/">
+        <div><h2>Vibe Coding 的代码质量与长期维护</h2><p class="article-row-date"><time datetime="2026-11-08">2026年11月8日</time></p><p>从验收条件到评审、测试和发布，把 AI 生成的代码纳入日常维护。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>AI 辅助开发</li><li>代码评审</li><li>质量保障</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="agent-patterns/">
+        <div><h2>从业务场景选择 Agent 的七种工程模式</h2><p class="article-row-date"><time datetime="2026-11-04">2026年11月4日</time></p><p>从任务步骤、验证方式和风险出发，比较七种可以组合的工程模式。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>技术选型</li><li>工作流编排</li><li>多 Agent 协作</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="agent-answer-evaluation/">
+        <div><h2>Agent 答对了多少题，怎样从一次评测里看出来？</h2><p class="article-row-date"><time datetime="2026-11-02">2026年11月2日</time></p><p>用一组酒店超标预订题，追踪样本如何进入实验、同一份回答怎样判分，以及平均分上升后仍要复核哪一道题。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Agent 评测</li><li>评测集</li><li>模型裁判</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="document-translation-recovery/">
+        <div><h2>文档翻译任务怎样在刷新和失败后继续</h2><p class="article-row-date"><time datetime="2026-10-08">2026年10月8日</time></p><p>从扫描 PDF 出发，讲翻译任务如何分步执行、补译和恢复进度。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>文档翻译</li><li>异步任务</li><li>故障恢复</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="agent-workflow-publishing/">
+        <div><h2>Agent 工作流画布的草稿保存与发布</h2><p class="article-row-date"><time datetime="2026-09-16">2026年9月16日</time></p><p>连线、改参数和发布连着发生时，怎样保存草稿并核对发布版本。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>可视化工作流</li><li>状态管理</li><li>版本发布</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="pdf-translation-adjustment/">
+        <div><h2>PDF 译文校准的坐标转换与回写</h2><p class="article-row-date"><time datetime="2026-09-08">2026年9月8日</time></p><p>从一次拖动看 PDF、OCR 和编辑器的坐标如何对齐，修改怎样写回译文。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>PDF 编辑</li><li>坐标变换</li><li>长文档渲染</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="agent-chat-sdk/">
+        <div><h2>一套 Chat SDK 怎样同时服务门户和调试窗口</h2><p class="article-row-date"><time datetime="2026-09-04">2026年9月4日</time></p><p>门户、调试和回放共享会话逻辑，分别管理实时事件和实例状态。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Chat SDK</li><li>实时通信</li><li>组件架构</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="skill-mcp-selection/">
+        <div><h2>多个 Skill 与 MCP 工具的选择和治理</h2><p class="article-row-date"><time datetime="2026-08-16">2026年8月16日</time></p><p>能力重叠时，按任务、权限和副作用选工具，并判断失败后能否切换。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>工具集成</li><li>MCP</li><li>Agent Skills</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="agent-pilot-rollout/">
+        <div><h2>Agent 功能怎样试点和放量</h2><p class="article-row-date"><time datetime="2026-08-13">2026年8月13日</time></p><p>从客服草稿试点出发，安排离线评估、影子对照、灰度与人工接管。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>灰度发布</li><li>技术选型</li><li>发布治理</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="agent-prompt-injection/">
+        <div><h2>Agent 提示注入怎样限制影响</h2><p class="article-row-date"><time datetime="2026-08-13">2026年8月13日</time></p><p>用一份带恶意指令的附件，说明读取、修改与外发各自的权限边界。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Agent 安全</li><li>提示注入</li><li>权限控制</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="agent-cost-control/">
+        <div><h2>Agent 调用成本怎样记账和限额</h2><p class="article-row-date"><time datetime="2026-08-08">2026年8月8日</time></p><p>按任务汇总调用费用，处理并发额度预占、超时核对和降本评估。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>成本控制</li><li>并发控制</li><li>模型调用</li></ul>
+    </li>
+  </ul>
+        <nav class="article-pagination" aria-label="文章分页">
+    <span class="article-page-unavailable">上一页</span>
+    <div class="article-page-numbers"><span aria-current="page" aria-label="第 1 页">1</span><a href="page/2/" aria-label="第 2 页">2</a><a href="page/3/" aria-label="第 3 页">3</a></div>
+    <span class="article-page-position">第 1 / 3 页</span>
+    <a href="page/2/" rel="next">下一页</a>
+  </nav>
+        
+      </div></main>
     <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../#articles">返回简历 ↑</a></footer>
   </div>
   <script>
@@ -189,6 +144,73 @@
           var next = current() === 'light' ? 'dark' : 'light';
           apply(next);
           try { localStorage.setItem('mblog-theme', next); } catch (e) {}
+        });
+      }
+      var topicMenu = document.querySelector('.article-topic-more');
+      if (topicMenu) {
+        const topicNav = topicMenu.closest('nav');
+        const tabs = topicNav.querySelector('.article-topic-tabs');
+        const items = [...tabs.children];
+        const allTopics = items[0];
+        const currentLink = tabs.querySelector('[aria-current]');
+        const currentTopic = currentLink.parentElement;
+        const overflowList = topicMenu.querySelector('ul');
+        const moreToggle = topicMenu.querySelector('summary');
+        let lastWidth;
+
+        function fitTopicTabs() {
+          const width = topicNav.getBoundingClientRect().width;
+          if (!width) return;
+          lastWidth = width;
+          const focused = document.activeElement;
+          const restoreFocus = topicNav.contains(focused);
+
+          // Measure each topic in the tab strip, where it has its natural width.
+          tabs.append(...items);
+          topicMenu.hidden = false;
+          const gap = parseFloat(getComputedStyle(tabs).columnGap);
+          const widths = items.map(item => item.getBoundingClientRect().width);
+          const totalWidth = widths.reduce((sum, itemWidth) => sum + itemWidth, 0) + gap * (items.length - 1);
+          const overflow = [];
+
+          if (totalWidth > width) {
+            const available = width - topicMenu.getBoundingClientRect().width - parseFloat(getComputedStyle(topicNav).columnGap);
+            let used = widths[0];
+            if (currentTopic !== allTopics) used += gap + widths[items.indexOf(currentTopic)];
+            items.forEach((item, index) => {
+              if (item === allTopics || item === currentTopic) return;
+              const next = used + gap + widths[index];
+              if (next <= available) used = next;
+              else overflow.push(item);
+            });
+          }
+
+          overflowList.replaceChildren(...overflow);
+          topicMenu.hidden = overflow.length === 0;
+          if (topicMenu.hidden) topicMenu.open = false;
+          if (restoreFocus) {
+            const target = topicMenu.contains(focused) && !topicMenu.open
+              ? (topicMenu.hidden ? currentLink : moreToggle)
+              : focused;
+            target.focus({ preventScroll: true });
+          }
+        }
+
+        fitTopicTabs();
+        new ResizeObserver(function () {
+          if (topicNav.getBoundingClientRect().width !== lastWidth) fitTopicTabs();
+        }).observe(topicNav);
+        document.fonts?.ready.then(fitTopicTabs);
+
+        function closeTopicMenuOutside(event) {
+          if (topicMenu.open && !topicMenu.contains(event.target)) topicMenu.open = false;
+        }
+        document.addEventListener('click', closeTopicMenuOutside);
+        document.addEventListener('focusin', closeTopicMenuOutside);
+        topicMenu.addEventListener('keydown', function (event) {
+          if (event.key !== 'Escape' || !topicMenu.open) return;
+          topicMenu.open = false;
+          moreToggle.focus();
         });
       }
     })();

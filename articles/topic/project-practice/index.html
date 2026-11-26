@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="母朝阳的 Agent 系统、知识检索与软件工程文章。">
+  <title>技术文章 · 项目实践 · 母朝阳</title>
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('mblog-theme'); } catch (e) {}
+      var theme = saved === 'light' || saved === 'dark' ? saved
+        : (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', theme === 'light' ? '#f3f6f4' : '#0d1115');
+    })();
+  </script>
+  <link rel="stylesheet" href="../../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../../#articles">返回简历</a><a href="../../">文章目录</a><button id="theme-toggle" class="theme-toggle" aria-label="切换浅色/深色主题"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button></nav>
+    </header>
+    <main id="article-main" tabindex="-1"><div class="article-heading"><h1>技术文章</h1><p>记录 Agent 系统设计、知识检索与软件工程中的取舍。</p></div>
+      <nav class="article-topic-filter" aria-label="按主题筛选">
+    <ul class="article-topic-tabs"><li><a href="../../">全部主题</a></li><li><a href="../../topic/project-practice/" aria-current="true">项目实践 <span>5</span></a></li><li><a href="../../topic/frontend-infrastructure/">微前端与前端基建 <span>6</span></a></li><li><a href="../../topic/project-maintenance/">大型项目维护 <span>3</span></a></li><li><a href="../../topic/miniapp-development/">小程序开发 <span>3</span></a></li><li><a href="../../topic/agent-architecture/">Agent 架构与选型 <span>3</span></a></li><li><a href="../../topic/memory-retrieval/">记忆与知识检索 <span>5</span></a></li><li><a href="../../topic/agent-delivery/">Agent 运行与交付 <span>5</span></a></li><li><a href="../../topic/engineering-tools/">工具与工程实践 <span>2</span></a></li></ul>
+    <details class="article-topic-more" hidden>
+    <summary aria-label="更多主题">更多</summary>
+    <ul></ul>
+  </details>
+  </nav>
+      <div class="article-index">
+        <p class="article-index-count">共 5 篇</p>
+        <ul class="article-list">
+    <li>
+      <a class="article-row" href="../../agent-answer-evaluation/">
+        <div><h2>Agent 答对了多少题，怎样从一次评测里看出来？</h2><p class="article-row-date"><time datetime="2026-11-02">2026年11月2日</time></p><p>用一组酒店超标预订题，追踪样本如何进入实验、同一份回答怎样判分，以及平均分上升后仍要复核哪一道题。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Agent 评测</li><li>评测集</li><li>模型裁判</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../document-translation-recovery/">
+        <div><h2>文档翻译任务怎样在刷新和失败后继续</h2><p class="article-row-date"><time datetime="2026-10-08">2026年10月8日</time></p><p>从扫描 PDF 出发，讲翻译任务如何分步执行、补译和恢复进度。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>文档翻译</li><li>异步任务</li><li>故障恢复</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../agent-workflow-publishing/">
+        <div><h2>Agent 工作流画布的草稿保存与发布</h2><p class="article-row-date"><time datetime="2026-09-16">2026年9月16日</time></p><p>连线、改参数和发布连着发生时，怎样保存草稿并核对发布版本。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>可视化工作流</li><li>状态管理</li><li>版本发布</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../pdf-translation-adjustment/">
+        <div><h2>PDF 译文校准的坐标转换与回写</h2><p class="article-row-date"><time datetime="2026-09-08">2026年9月8日</time></p><p>从一次拖动看 PDF、OCR 和编辑器的坐标如何对齐，修改怎样写回译文。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>PDF 编辑</li><li>坐标变换</li><li>长文档渲染</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../agent-chat-sdk/">
+        <div><h2>一套 Chat SDK 怎样同时服务门户和调试窗口</h2><p class="article-row-date"><time datetime="2026-09-04">2026年9月4日</time></p><p>门户、调试和回放共享会话逻辑，分别管理实时事件和实例状态。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Chat SDK</li><li>实时通信</li><li>组件架构</li></ul>
+    </li>
+  </ul>
+        
+        
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../../#articles">返回简历 ↑</a></footer>
+  </div>
+  <script>
+    (function () {
+      var MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 14.2A8.6 8.6 0 0 1 9.8 3.4a8.6 8.6 0 1 0 10.8 10.8Z"/></svg>';
+      var SUN = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>';
+      var root = document.documentElement;
+      var button = document.getElementById('theme-toggle');
+      function current() { return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+      function icon(theme) { return theme === 'light' ? MOON : SUN; }
+      function meta(theme) {
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute('content', theme === 'light' ? '#f3f6f4' : '#0d1115');
+      }
+      function apply(theme) {
+        if (theme === 'light') root.setAttribute('data-theme', 'light');
+        else root.removeAttribute('data-theme');
+        meta(theme);
+        if (button) button.innerHTML = icon(theme);
+      }
+      if (button) {
+        button.innerHTML = icon(current());
+        button.addEventListener('click', function () {
+          var next = current() === 'light' ? 'dark' : 'light';
+          apply(next);
+          try { localStorage.setItem('mblog-theme', next); } catch (e) {}
+        });
+      }
+      var topicMenu = document.querySelector('.article-topic-more');
+      if (topicMenu) {
+        const topicNav = topicMenu.closest('nav');
+        const tabs = topicNav.querySelector('.article-topic-tabs');
+        const items = [...tabs.children];
+        const allTopics = items[0];
+        const currentLink = tabs.querySelector('[aria-current]');
+        const currentTopic = currentLink.parentElement;
+        const overflowList = topicMenu.querySelector('ul');
+        const moreToggle = topicMenu.querySelector('summary');
+        let lastWidth;
+
+        function fitTopicTabs() {
+          const width = topicNav.getBoundingClientRect().width;
+          if (!width) return;
+          lastWidth = width;
+          const focused = document.activeElement;
+          const restoreFocus = topicNav.contains(focused);
+
+          // Measure each topic in the tab strip, where it has its natural width.
+          tabs.append(...items);
+          topicMenu.hidden = false;
+          const gap = parseFloat(getComputedStyle(tabs).columnGap);
+          const widths = items.map(item => item.getBoundingClientRect().width);
+          const totalWidth = widths.reduce((sum, itemWidth) => sum + itemWidth, 0) + gap * (items.length - 1);
+          const overflow = [];
+
+          if (totalWidth > width) {
+            const available = width - topicMenu.getBoundingClientRect().width - parseFloat(getComputedStyle(topicNav).columnGap);
+            let used = widths[0];
+            if (currentTopic !== allTopics) used += gap + widths[items.indexOf(currentTopic)];
+            items.forEach((item, index) => {
+              if (item === allTopics || item === currentTopic) return;
+              const next = used + gap + widths[index];
+              if (next <= available) used = next;
+              else overflow.push(item);
+            });
+          }
+
+          overflowList.replaceChildren(...overflow);
+          topicMenu.hidden = overflow.length === 0;
+          if (topicMenu.hidden) topicMenu.open = false;
+          if (restoreFocus) {
+            const target = topicMenu.contains(focused) && !topicMenu.open
+              ? (topicMenu.hidden ? currentLink : moreToggle)
+              : focused;
+            target.focus({ preventScroll: true });
+          }
+        }
+
+        fitTopicTabs();
+        new ResizeObserver(function () {
+          if (topicNav.getBoundingClientRect().width !== lastWidth) fitTopicTabs();
+        }).observe(topicNav);
+        document.fonts?.ready.then(fitTopicTabs);
+
+        function closeTopicMenuOutside(event) {
+          if (topicMenu.open && !topicMenu.contains(event.target)) topicMenu.open = false;
+        }
+        document.addEventListener('click', closeTopicMenuOutside);
+        document.addEventListener('focusin', closeTopicMenuOutside);
+        topicMenu.addEventListener('keydown', function (event) {
+          if (event.key !== 'Escape' || !topicMenu.open) return;
+          topicMenu.open = false;
+          moreToggle.focus();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

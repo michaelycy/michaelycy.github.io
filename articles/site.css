@@ -6,11 +6,14 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--line);
 }
 
 .article-list > li {
-  border-bottom: 1px solid var(--line);
+  padding: 20px 2px;
+}
+
+.article-list > li + li {
+  border-top: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
 }
 
 .article-row {
@@ -23,16 +26,29 @@
   text-decoration: none;
 }
 
-.article-row:hover h3,
-.article-row:focus-visible h3 {
+.article-list .article-row { padding: 0; }
+
+.article-row:hover :is(h2, h3),
+.article-row:focus-visible :is(h2, h3) {
   color: var(--accent);
 }
 
-.article-row h3 {
+.article-row :is(h2, h3) {
   margin: 0;
   font-size: 19px;
   font-weight: 400;
   line-height: 1.55;
+}
+
+.article-row :is(h2, h3),
+.article-topic-more a,
+.article-pagination a,
+.article-header nav a,
+.article-footer a {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 62%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .22em;
 }
 
 .article-row p {
@@ -50,19 +66,18 @@
 .article-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 6px 8px;
   margin: 10px 0 0;
   padding: 0;
   list-style: none;
 }
 
 .article-tags > li {
-  padding: 2px 8px;
-  border: 1px solid var(--tint-line);
-  border-radius: 4px;
-  background: var(--tint);
-  color: var(--accent-text);
-  font-size: 12px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line) 60%, transparent);
+  color: var(--text-2);
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -196,8 +211,7 @@
   border-bottom: 1px solid var(--line);
 }
 
-.article-header a,
-.article-footer a {
+.article-brand {
   text-decoration: none;
 }
 
@@ -254,16 +268,150 @@
   font-size: 14px;
 }
 
-.article-category {
+.article-index {
   max-width: 800px;
-  margin: 10px 0 32px;
 }
 
-.article-category h2 {
-  margin: 0 0 12px;
-  font-size: 21px;
+.article-index-count {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.article-topic-filter {
+  --topic-gap: 24px;
+  --topic-muted: #a2ada9;
+  --topic-count: #8a9a92;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--topic-gap);
+  border-bottom: 1px solid var(--line);
+  color: var(--topic-muted);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+[data-theme="light"] .article-topic-filter { --topic-muted: #5c6963; --topic-count: #6f7b75; }
+
+.article-topic-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  column-gap: var(--topic-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.article-topic-tabs > li { flex: none; }
+
+.article-topic-tabs a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0 13px;
+  color: var(--topic-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .2s;
+}
+
+.article-topic-tabs a::after {
+  position: absolute;
+  content: '';
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform .25s ease;
+}
+
+.article-topic-tabs a[aria-current] { color: var(--accent); }
+.article-topic-tabs a[aria-current]::after { transform: scaleX(1); }
+.article-topic-tabs a:focus-visible { outline-offset: 6px; }
+
+.article-topic-filter a > span {
+  color: var(--topic-count);
+  font: 12px Consolas, monospace;
+}
+
+.article-topic-more { position: relative; flex: none; }
+
+.article-topic-more summary {
+  padding: 10px 0 13px;
+  list-style-position: inside;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.article-topic-more ul {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 100%;
+  inset-inline-end: 0;
+  width: max-content;
+  min-width: 180px;
+  max-width: min(280px, 88vw);
+  max-height: min(340px, 60vh);
+  overflow-y: auto;
+  margin: 4px 0 0;
+  padding: 4px 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  list-style: none;
+}
+
+.article-topic-more a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding-inline: 4px;
+}
+
+.article-topic-filter a:hover,
+.article-topic-more summary:hover { color: var(--text); }
+.article-pagination a:hover { color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .article-topic-tabs a, .article-topic-tabs a::after { transition: none; }
+}
+
+.article-pagination,
+.article-page-numbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.article-pagination { margin-top: 24px; font-size: 14px; white-space: nowrap; }
+
+.article-pagination a,
+.article-page-numbers [aria-current] {
+  display: inline-grid;
+  min-width: 36px;
+  min-height: 44px;
+  padding-inline: 8px;
+  place-items: center;
+}
+
+.article-page-numbers [aria-current] {
+  border-radius: 4px;
+  background: var(--tint);
+  color: var(--accent-text);
   font-weight: 600;
 }
+
+.article-page-unavailable { padding-inline: 8px; color: var(--muted); opacity: .68; }
+.article-page-position { display: none; color: var(--muted); }
+.article-draft-preview { margin-top: 24px; }
+.article-draft-preview > summary { color: var(--muted); cursor: pointer; }
 
 .article-reading-grid {
   display: grid;
@@ -440,6 +588,8 @@
 }
 
 @media (max-width: 760px) {
+  .article-topic-more { position: static; }
+
   .article-reading-grid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: 'toc' 'body';
@@ -455,16 +605,20 @@
   }
 }
 
+
 @media (max-width: 600px) {
   .home-articles { margin-top: 48px; }
+  .article-list > li { padding-block: 16px; }
   .article-row { padding: 16px 2px; gap: 12px; }
-  .article-row h3 { font-size: 17px; }
+  .article-row :is(h2, h3) { font-size: 17px; }
   .article-row p { font-size: 14px; }
   .home-article-lead h3 { font-size: 21px; }
   .home-article-links h3 { font-size: 15px; }
   .article-shell { width: calc(100% - 36px); }
   .article-header nav { gap: 16px; }
   .article-heading { padding: 30px 0 22px; }
+  .article-page-numbers { display: none; }
+  .article-page-position { display: inline; }
   .article-prose { font-size: 16px; }
   .article-prose h2 { font-size: 21px; }
   .article-prose pre, .article-prose details { padding: 12px; }
