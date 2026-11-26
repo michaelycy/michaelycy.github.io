@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedOn": "2026-11-25",
+  "updatedOn": "2026-11-26",
   "profile": {
     "name": "母朝阳",
     "github": "https://github.com/michaelycy",
@@ -91,7 +91,8 @@
         "Agent 工具集成",
         "RAG",
         "文档处理",
-        "流式人机交互"
+        "流式人机交互",
+        "AI Coding 工作流"
       ],
       "projectIds": [
         "document-translation",
@@ -121,6 +122,9 @@
       "role": "全栈开发",
       "period": "2026.06-2026.10",
       "projectIds": [
+        "document-quality",
+        "agent-platform",
+        "document-translation",
         "corporate-portal",
         "bilingual-portal"
       ]
@@ -139,35 +143,57 @@
       "name": "奇利匙信息技术（上海）有限公司",
       "role": "大前端 Leader",
       "period": "2022.11-2025.09",
-      "projectIds": []
+      "projectIds": [
+        "retail-miniapp",
+        "enterprise-commerce",
+        "brand-omnichannel",
+        "industrial-commerce",
+        "multichannel-commerce",
+        "operations-microfrontend"
+      ]
     },
     {
       "id": "career-5",
       "name": "上海快仓智能科技有限公司",
       "role": "前端 Leader",
       "period": "2021.12-2022.11",
-      "projectIds": []
+      "projectIds": [
+        "industrial-visualization",
+        "industrial-handheld"
+      ]
     },
     {
       "id": "career-6",
       "name": "上海易恒健康科技有限公司",
       "role": "前端 Leader",
       "period": "2021.04-2021.12",
-      "projectIds": []
+      "projectIds": [
+        "survey-platform",
+        "react-component-system",
+        "health-commerce",
+        "vue-component-system"
+      ]
     },
     {
       "id": "career-7",
       "name": "杭州数云信息技术有限公司",
       "role": "高级前端开发工程师",
       "period": "2014.08-2021.04",
-      "projectIds": []
+      "projectIds": [
+        "frontend-ecosystem",
+        "modular-crm",
+        "design-code-tool",
+        "crm-foundation"
+      ]
     },
     {
       "id": "career-8",
       "name": "南京安讯科技有限责任公司",
       "role": ".NET 开发工程师",
       "period": "2012.06-2014.08",
-      "projectIds": []
+      "projectIds": [
+        "mobile-portal"
+      ]
     }
   ],
   "projects": [
@@ -270,7 +296,7 @@
       "background": "Taro 与 React 跨端小程序，支持动态内容配置和国际化。",
       "role": "前端负责人",
       "period": "2025—2026",
-      "periodContext": "",
+      "periodContext": "相关任职期间",
       "completeness": "detailed",
       "stack": [
         "Taro 4",
@@ -791,7 +817,7 @@
       "name": "文档版式质检平台",
       "background": "交付人员可比较原文与译文，按页定位版式差异、确认风险并回查复核报告。",
       "role": "全栈开发",
-      "period": "2026.09-至今",
+      "period": "2026.09-2026.10",
       "periodContext": "",
       "completeness": "detailed",
       "stack": [
@@ -977,5 +1003,5 @@
       "relatedProjectIds": []
     }
   ],
-  "version": "bb6d5fbda09e"
+  "version": "39956cbc29e9"
 }
