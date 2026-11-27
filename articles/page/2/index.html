@@ -28,15 +28,33 @@
     </header>
     <main id="article-main" tabindex="-1"><div class="article-heading"><h1>技术文章</h1><p>记录 Agent 系统设计、知识检索与软件工程中的取舍。</p></div>
       <nav class="article-topic-filter" aria-label="按主题筛选">
-    <ul class="article-topic-tabs"><li><a href="../../" aria-current="true">全部主题</a></li><li><a href="../../topic/project-practice/">项目实践 <span>5</span></a></li><li><a href="../../topic/frontend-infrastructure/">微前端与前端基建 <span>6</span></a></li><li><a href="../../topic/project-maintenance/">大型项目维护 <span>3</span></a></li><li><a href="../../topic/miniapp-development/">小程序开发 <span>3</span></a></li><li><a href="../../topic/agent-architecture/">Agent 架构与选型 <span>3</span></a></li><li><a href="../../topic/memory-retrieval/">记忆与知识检索 <span>5</span></a></li><li><a href="../../topic/agent-delivery/">Agent 运行与交付 <span>5</span></a></li><li><a href="../../topic/engineering-tools/">工具与工程实践 <span>2</span></a></li></ul>
+    <ul class="article-topic-tabs"><li><a href="../../" aria-current="true">全部主题</a></li><li><a href="../../topic/agent-architecture-delivery/">Agent 架构与交付 <span>13</span></a></li><li><a href="../../topic/memory-retrieval/">记忆与知识检索 <span>5</span></a></li><li><a href="../../topic/agent-tools-engineering/">Agent 工具与工程 <span>5</span></a></li><li><a href="../../topic/frontend-engineering-practice/">前端工程与实践 <span>12</span></a></li></ul>
     <details class="article-topic-more" hidden>
     <summary aria-label="更多主题">更多</summary>
     <ul></ul>
   </details>
   </nav>
       <div class="article-index">
-        <p class="article-index-count">共 32 篇</p>
+        <p class="article-index-count">共 35 篇</p>
         <ul class="article-list">
+    <li>
+      <a class="article-row" href="../../agent-pilot-rollout/">
+        <div><h2>Agent 功能怎样试点和放量</h2><p class="article-row-date"><time datetime="2026-08-13">2026年8月13日</time></p><p>从客服草稿试点出发，安排离线评估、影子对照、灰度与人工接管。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>灰度发布</li><li>技术选型</li><li>发布治理</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../agent-prompt-injection/">
+        <div><h2>Agent 提示注入怎样限制影响</h2><p class="article-row-date"><time datetime="2026-08-13">2026年8月13日</time></p><p>用一份带恶意指令的附件，说明读取、修改与外发各自的权限边界。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>Agent 安全</li><li>提示注入</li><li>权限控制</li></ul>
+    </li>
+    <li>
+      <a class="article-row" href="../../agent-cost-control/">
+        <div><h2>Agent 调用成本怎样记账和限额</h2><p class="article-row-date"><time datetime="2026-08-08">2026年8月8日</time></p><p>按任务汇总调用费用，处理并发额度预占、超时核对和降本评估。</p></div>
+      </a>
+      <ul class="article-tags" aria-label="文章标签"><li>成本控制</li><li>并发控制</li><li>模型调用</li></ul>
+    </li>
     <li>
       <a class="article-row" href="../../agent-debugging-replay/">
         <div><h2>Agent 故障怎样定位和安全复跑</h2><p class="article-row-date"><time datetime="2026-08-02">2026年8月2日</time></p><p>从一次提交超时出发，追踪任务状态并验证复跑是否会重复写入。</p></div>
@@ -90,24 +108,6 @@
         <div><h2>小程序切到英文以后，为什么活动横幅还是中文</h2><p class="article-row-date"><time datetime="2025-12-12">2025年12月12日</time></p><p>从一张仍显示中文的活动横幅，查到翻译文案、后台图片、页面缓存和落地页。</p></div>
       </a>
       <ul class="article-tags" aria-label="文章标签"><li>小程序</li><li>国际化</li><li>CMS</li></ul>
-    </li>
-    <li>
-      <a class="article-row" href="../../multichannel-sku-selection/">
-        <div><h2>同一件商品，怎样在三个小程序里选对规格</h2><p class="article-row-date"><time datetime="2025-06-20">2025年6月20日</time></p><p>跟着一件外套核对分享卡片、各渠道的可售规格和订单，查出默认选项在哪一步换了颜色。</p></div>
-      </a>
-      <ul class="article-tags" aria-label="文章标签"><li>跨端电商</li><li>SKU</li><li>库存</li></ul>
-    </li>
-    <li>
-      <a class="article-row" href="../../miniapp-subpackage-entry-testing/">
-        <div><h2>微信商城分包后，首页和分享卡片该怎样验</h2><p class="article-row-date"><time datetime="2025-03-21">2025年3月21日</time></p><p>分别从商城首页和商品分享卡片进入，记录什么时候能浏览商品、什么时候能选中尺码。</p></div>
-      </a>
-      <ul class="article-tags" aria-label="文章标签"><li>微信小程序</li><li>分包</li><li>启动性能</li></ul>
-    </li>
-    <li>
-      <a class="article-row" href="../../open-tabs-after-deployment/">
-        <div><h2>运营平台发完新版，为什么旧标签页还会出错</h2><p class="article-row-date"><time datetime="2024-02-23">2024年2月23日</time></p><p>跟着旧标签页的一次详情请求，检查独立发版与回退后仍有人需要的静态资源。</p></div>
-      </a>
-      <ul class="article-tags" aria-label="文章标签"><li>微前端</li><li>静态资源</li><li>发布回退</li></ul>
     </li>
   </ul>
         <nav class="article-pagination" aria-label="文章分页">

@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="沿新增退款、优惠券改叠加、修复发货时间、下线备用地址四个场景，走完锚点文档、保旧测新增量 TDD 到审计的闭环。">
+  <title>ADD（锚点驱动开发）实战：用 AI 稳妥搞定“加功能、改需求、修 Bug、删代码” · 母朝阳</title>
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('mblog-theme'); } catch (e) {}
+      var theme = saved === 'light' || saved === 'dark' ? saved
+        : (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', theme === 'light' ? '#f3f6f4' : '#0d1115');
+    })();
+  </script>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a><button id="theme-toggle" class="theme-toggle" aria-label="切换浅色/深色主题"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">Agent 工具与工程</p>
+        <h1>ADD（锚点驱动开发）实战：用 AI 稳妥搞定“加功能、改需求、修 Bug、删代码”</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-28">2026年11月28日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>AI 辅助开发</li><li>锚点驱动开发</li><li>测试策略</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">场景一（新功能）：订单页面新增“退款”功能</a></li><li><a href="#section-2">场景二（功能修改）：订单结算优惠券改为“平台券 + 店铺券叠加”</a></li><li><a href="#section-3">场景三（Bug 修复）：订单发货时“发货时间没有及时更新”</a></li><li><a href="#section-4">场景四（功能移除）：账户模块删除“备用地址”功能</a></li><li><a href="#section-5">聊个实战细节：现在的 AI 这么聪明，还要手动敲 `/skill` 显式调用吗？</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>前两篇聊完 <strong>ADD（Anchor-Driven Development，锚点驱动开发）</strong> 的理念和底座配置后，很多兄弟心里肯定还在犯嘀咕：这套靠<strong>索引锚点、代码反向锚点、视觉边界锚点、验收测试锚点</strong>焊起来的“铁笼子”，听起来头头是道，<strong>真放到每天鸡飞狗跳的真实业务里，到底跑不跑得通？会不会太重？</strong></p>
+<p>光说不练假把式。今天我们直接拉四个你在日常维护复杂项目时躲都躲不掉的真实需求，手把手走一遍 ADD 实战流程：</p>
+<ol>
+<li><strong>新功能：</strong> 在订单页面新增一个“退款”功能；</li>
+<li><strong>功能修改：</strong> 修改订单结算的优惠券规则——从“仅支持单张互斥”改为“支持 1 张平台券 + 1 张店铺券叠加”；</li>
+<li><strong>Bug 修复：</strong> 排查并修复一个线上 Bug——订单发货时，发货时间没有及时更新；</li>
+<li><strong>功能移除：</strong> 把账户模块里已经废弃的“备用地址”功能彻底下线。</li>
+</ol>
+<p>之所以挑这四个，是因为它们刚好把研发日常的<strong>增、改、修、删</strong>全覆盖了。</p>
+<p>在动手之前，先立一条死规矩：<strong>严禁在同一个 AI 对话框里把这四件事混着做！</strong> 千万别图省事跟 AI 说“你顺手帮我把这几个任务一起改了”。正确姿势是拆成 <strong>4 个独立会话 + 4 个独立 Git 分支</strong>，干完一件合一件，彻底杜绝上下文串台和 AI 逻辑错乱。</p>
+<hr>
+<h2 id="section-1">场景一（新功能）：订单页面新增“退款”功能</h2>
+<p>如果按以前“凭感觉聊天”的写法，你跟 AI 说“给订单页加个退款功能”，大概率会收获一个惨剧：AI 自己脑补了一堆设计图里没有的退款原因下拉框、漏掉了“已关闭订单不能退款”的后端校验，最后再给你补几个 <code>expect(refundStatus).toBe('SUCCESS')</code> 的假单测。</p>
+<p>换上 <strong>ADD（锚点驱动开发）</strong> 的打法，整条链路是这样的：
+<strong>Skills 接力：</strong> <code>/spec-architect</code> → <code>test-strategist</code>（自动护栏） → <code>ui-fidelity-guard</code>（自动护栏） → <code>/drift-auditor</code> → <code>/context-compressor</code></p>
+<h3>1. 先立规格锚点与视觉锚点（此时严禁写一行代码）</h3>
+<p>第一步先把 AI 按住，不让它碰业务代码。直接在第一行敲 <code>/spec-architect</code>，让它先扫一眼 <code>docs/INDEX.md</code>（索引锚点）和现有的订单详情代码，然后干两件事：</p>
+<ul>
+<li>新建 <code>docs/specs/order/refund.md</code>（死守 300 行以内），把允许退款的订单状态、全额/部分退款规则、防重复提交的幂等键、接口错误码，以及至少 5 个 <code>Given-When-Then</code> 验收锚点写明白。</li>
+<li>同步更新 <code>docs/INDEX.md</code> 和 <code>docs/ui-manifest.md</code>（视觉边界锚点），锁死“申请退款”按钮放哪、弹窗里有哪些字段、<strong>绝对不能加什么多余元素</strong>，以及 Loading / Empty / Error / Submitting 四种边界态。</li>
+</ul>
+<p>这一步你可以直接复制下面这段 Prompt 发给 AI：</p>
+<pre><code class="language-text">/spec-architect
+先读 `docs/INDEX.md` 索引锚点和订单详情相关代码。我们需要在订单页面新增“退款”功能。
+现在严禁写业务代码。请先起草 `docs/specs/order/refund.md`（含状态机流转、幂等规则、错误码和至少 5 个 Given-When-Then 验收锚点），并给出 `docs/ui-manifest.md` 的增量修改方案（含弹窗字段、禁止项和 4 种边界态）。
+同时列出你认为需求中模糊的地方，等我确认。
+
+</code></pre>
+<p>等你人工把这份 Spec 过一遍、把模糊的业务规则拍板定死，再往下走。</p>
+<h3>2. 锁死验收锚点：先写红灯测试，再写业务代码</h3>
+<p>文档确认后，进入开发与验证阶段。此时 <code>test-strategist</code> 和 <code>ui-fidelity-guard</code> 会作为护栏自动生效，逼着 AI 先对照 <code>refund.md</code> 里的 <code>Given-When-Then</code> 验收锚点把测试写出来：</p>
+<ul>
+<li><strong>后端：</strong> 直连真实测试库（Testcontainers），测完整的 HTTP 退款请求、退款单落库、以及“重复发起退款返回 409”的真实事务行为。</li>
+<li><strong>前端：</strong> 用 Playwright 写 E2E 测试，只点用户看得到的按钮和文字。</li>
+</ul>
+<p>先跑一遍测试，<strong>亲眼看到它们全部红灯报错</strong>，再让 AI 去写前后端实现代码（文件顶部必须埋好 <code>// @spec: docs/specs/order/refund.md</code> 反向锚点），前端同时盯着设计令牌和视觉截图比对，直到所有测试变绿。</p>
+<p>直接丢这段 Prompt：</p>
+<pre><code class="language-text">/test-strategist
+Spec 已确认。请先根据 `docs/specs/order/refund.md` 编写后端真实数据库集成测试和 Playwright E2E 测试，严禁 Mock 数据库和写无意义单测。
+确认测试为红灯后，再实现前后端业务代码（前端严格遵守 `docs/ui-manifest.md` 视觉边界锚点），直到所有测试变绿。
+
+</code></pre>
+<h3>3. 提 PR 前四锚点审计 + 压记忆</h3>
+<p>功能跑通后，别急着合并。直接敲 <code>/drift-auditor</code> 让 AI 扮演严苛的 Tech Lead 对照 <code>git diff</code> 和四大锚点查漏项、查越界，再顺手跑一下 <code>python3 scripts/check_spec_anchors.py</code>。全部没问题，最后用 <code>/context-compressor</code> 把这次的决策写进 <code>PROGRESS.md</code>，收工。</p>
+<hr>
+<h2 id="section-2">场景二（功能修改）：订单结算优惠券改为“平台券 + 店铺券叠加”</h2>
+<p>日常开发里，<strong>改老需求其实比写新功能更容易翻车</strong>。</p>
+<p>以前直接让 AI 改需求，最常出现三种暗坑：一是 AI 只改了代码里的 <code>if</code> 判断，压根没动需求文档，从此文档和代码彻底分家；二是 AI 改新逻辑时，顺手把老逻辑里的兜底校验（比如“实付最低 1 分”）给改坏了；三是原有测试用例一跑全红，AI 为了图省事直接把老断言给删了或者改松了。</p>
+<p>在 ADD 体系下，改老功能的核心心法是：<strong>顺着锚点先改文档 Diff，再做“保旧测新”的增量 TDD。</strong></p>
+<p><strong>Skills 接力：</strong> <code>/spec-architect</code>（变更 Diff） → <code>/test-strategist</code>（保旧测新） → <code>ui-fidelity-guard</code>（更新视觉锚点） → <code>/drift-auditor</code> → <code>/context-compressor</code></p>
+<h3>落地四步走</h3>
+<ol>
+<li><strong>顺着代码反向锚点，先改 Spec 与 UI 清单（严禁直接改代码）：</strong>
+让 <code>/spec-architect</code> 打开 <code>src/services/checkout.ts</code>，顺着第一行的 <code>// @spec: docs/specs/order/checkout.md</code> 和 <code>// @ui-manifest</code> 瞬间定位到唯一对应的规格文档与视觉清单。</li>
+</ol>
+<ul>
+<li>在 <code>checkout.md</code> 里明确变更边界：把原规则“每笔订单最多 1 张券”更新为“允许 1 张平台券 + 1 张店铺券叠加；先扣店铺券，再按剩余商品金额判断是否满足平台券门槛；<strong>优惠后商品实付最低 1 分的老规则保持不变</strong>”。</li>
+<li>同步更新 <code>docs/ui-manifest.md</code>：将 <code>CouponSelectModal</code> 从单选列表调整为按“平台券 / 店铺券”分组单选，并明确“同类型券依然互斥”。</li>
+<li>人工 Review 文档 Diff，把边界歧义拍板定死。</li>
+</ul>
+<ol start="2">
+<li><strong>增量 TDD（严格区分“要改的旧测试”和“绝不能动的旧红线”）：</strong>
+让 <code>/test-strategist</code> 列出测试变更计划：只修改被新需求明确替代的那一条旧用例（“双券互斥报错”），<strong>严禁触碰“兜底 1 分”、“过期券拦截”、“运费不参与门槛”等老回归用例</strong>；同时针对叠加算价顺序和折后门槛补齐新的红灯集成测试与 Playwright E2E 测试。</li>
+<li><strong>编码实现与视觉基线刷新：</strong>
+修改后端算价服务、接口契约与前端弹窗组件，跑通<strong>新老全部测试</strong>（必须全绿），并重新生成 <code>CouponSelectModal</code> 的 Playwright 视觉基线图。</li>
+<li><strong>提 PR 前四锚点审计：</strong>
+敲 <code>/drift-auditor</code> 重点检查“有没有误伤未要求变更的老逻辑”、“旧测试断言有没有被偷偷削弱”，确认无误后用 <code>/context-compressor</code> 记录本次规则变更。</li>
+</ol>
+<p>第一步可以直接甩给 AI 的 Prompt：</p>
+<pre><code class="language-text">/spec-architect
+打开 `src/services/checkout.ts`，顺着顶部的 `@spec` 和 `@ui-manifest` 反向锚点读取对应的规格与视觉清单。
+我们需要修改优惠券规则：从“仅支持单张互斥”改为“支持 1 张平台券 + 1 张店铺券叠加（先扣店铺券，再按折后商品金额校验平台券门槛）”。
+现在严禁改业务代码。请先输出变更方案：
+1. `docs/specs/order/checkout.md` 与 `docs/ui-manifest.md` 的具体 Diff 修改内容；
+2. 现有测试用例中，哪些属于“被新需求废止需调整”，哪些属于“必须保留的老回归红线”；
+3. 新增的叠加边界与异常流 Given-When-Then 验收场景。
+等我确认后再按“先改红灯测试 → 再改业务代码”的顺序推进。
+
+</code></pre>
+<hr>
+<h2 id="section-3">场景三（Bug 修复）：订单发货时“发货时间没有及时更新”</h2>
+<p>修 Bug 是 Vibe Coding 最容易陷入死循环的地方。传统做法是把报错扔给 AI，AI 猜一个原因改一通，不行再猜另一个原因改一通，改到最后 Bug 好像没了，结果把别的逻辑搞崩了，而且下个月这个 Bug 还会卷土重来。</p>
+<p>ADD 的原则很硬：<strong>没顺着反向锚点找到根因不准改代码，没写出复现 Bug 的失败测试不准修 Bug。</strong></p>
+<p><strong>Skills 接力：</strong> <code>/bug-investigator</code> → <code>test-strategist</code>（自动护栏） → <code>/drift-auditor</code></p>
+<h3>落地四步走</h3>
+<ol>
+<li><strong>顺反向锚点定性：</strong> 第一行敲 <code>/bug-investigator</code>，让 AI 找到发货代码顶部的 <code>@spec</code> 反向锚点，先核对“发货时间更新”到底是怎么规定的——是接口同步写库，还是异步事件更新，还是其实库里更新了只是缓存/前端没刷新？</li>
+<li><strong>追踪全链路定位根因：</strong> 让 AI 顺着 <code>Controller → Service → DB/Cache</code> 一层层扒，精准指出是哪一行漏了 <code>shipped_at = NOW()</code>、事务提交顺序不对，还是 Redis 缓存没清掉。</li>
+<li><strong>先写“红灯防线”：</strong> 写一个真实的集成测试：调用发货接口 → 立刻查订单详情 → 断言 <code>shipped_at</code> 非空且在当前时间几秒误差内。运行它，<strong>必须看到它稳定复现报错</strong>。</li>
+<li><strong>修复并全量回归：</strong> 动刀修代码，重新跑测试看到红灯变绿，再跑一遍订单模块全量测试，最后用 <code>/drift-auditor</code> 检查有没有误伤无关代码。</li>
+</ol>
+<p>可以直接甩给 AI 的 Prompt：</p>
+<pre><code class="language-text">/bug-investigator
+目前订单发货时存在 Bug：调用发货后，发货时间（`shipped_at`）没有及时更新。
+不要直接猜着改代码。请严格按 ADD 4 步执行：
+1. 找到发货相关代码并读取顶部的 `@spec` 反向锚点，确认预期行为；
+2. 追踪完整代码链路（含数据库更新与缓存清理），指出精确的根因位置；
+3. 先写一个能稳定复现该 Bug 的失败集成测试并运行给我看；
+4. 等我确认根因后，再修复代码并跑通全量回归测试。
+
+</code></pre>
+<p>这样做完，你不仅修好了这个 Bug，还在仓库里焊死了一道回归防线，以后不管是人还是 AI 再改发货代码，只要敢把 <code>shipped_at</code> 弄丢，测试立刻拉响警报。</p>
+<hr>
+<h2 id="section-4">场景四（功能移除）：账户模块删除“备用地址”功能</h2>
+<p>很多人觉得删功能最简单，其实在 AI 编程里，<strong>做减法比做加法更危险</strong>。AI 天生擅长写新代码，但一到删老功能，特别容易删得丢三落四：前端按钮删了但弹窗组件还在、接口删了但 DTO 字段和文档还挂着、或者更可怕——AI 勤快地顺手帮你把数据库里的 <code>backup_address</code> 字段给 <code>DROP</code> 了，结果线上需要回滚时直接炸锅。</p>
+<p><strong>Skills 接力：</strong> <code>/spec-architect</code>（盘点影响面） → <code>/drift-auditor</code>（死代码清扫） → <code>/context-compressor</code></p>
+<h3>落地三步走</h3>
+<ol>
+<li><strong>先出《下线影响面清单》，严禁直接删代码：</strong>
+用 <code>/spec-architect</code> 让 AI 先读 <code>docs/INDEX.md</code> 和 <code>docs/ui-manifest.md</code>，再全仓搜一遍所有引用“备用地址”的文件、接口、DTO 和测试用例。</li>
+</ol>
+<ul>
+<li><strong>数据库安全铁律：</strong> 明确要求 AI 只在代码里停止读写 <code>backup_address</code> 字段，<strong>本次发布严禁物理删列</strong>，并把这项灰度清理决策记进 <code>ARCHITECTURE.md</code>。</li>
+</ul>
+<ol start="2">
+<li><strong>按“锚点文档 → 测试 → 前端 → 后端”顺序拆除：</strong>
+先改 <code>docs/specs/account/address.md</code> 和 <code>docs/ui-manifest.md</code> 删掉备用地址规格；再清理专门测备用地址的旧用例；最后依次删掉前端 UI 区块、后端接口和 Service 逻辑。</li>
+<li><strong>全仓残留扫描与锚点巡检：</strong>
+敲 <code>/drift-auditor</code>，用关键词（如 <code>backupAddress</code>、<code>secondary_address</code>）把整个仓库拉网式扫一遍，确保没有孤儿组件、废弃类型或僵尸路由，最后跑 <code>check_spec_anchors.py</code> 和全量测试，确认主地址的增删改查完好无损。</li>
+</ol>
+<p>可以直接甩给 AI 的 Prompt：</p>
+<pre><code class="language-text">/spec-architect
+我们需要彻底下线账户模块中的“备用地址”功能。
+现在严禁直接删代码。请先读 `docs/INDEX.md` 和 `docs/ui-manifest.md`，并全仓检索相关引用，输出一份《下线影响面清单》，必须包含：
+1. 需要修改的 Spec 文档与 UI Manifest 视觉锚点区块；
+2. 需要删除或修改的前端页面、后端接口、DTO 与测试用例清单；
+3. 数据库存量字段的安全处理建议（仅停止读写，暂不物理删列）。
+等我确认清单后，再按“文档 → 测试 → 代码”的顺序执行清理，并在完成后用 `/drift-auditor` 扫描残留死代码。
+
+</code></pre>
+<hr>
+<h2 id="section-5">聊个实战细节：现在的 AI 这么聪明，还要手动敲 <code>/skill</code> 显式调用吗？</h2>
+<p>看到这里，很多常年用 Claude Code、Cursor 或 Windsurf 的兄弟可能会问：现在的 AI 编程工具不是已经支持“渐进式技能发现”了吗？只要把 <code>description</code> 写清楚，AI 自己就能匹配并挂载对应的 <code>SKILL.md</code>，为啥我们在 ADD 流程的关键步骤里还要手动敲 <code>/spec-architect</code>、<code>/bug-investigator</code>？</p>
+<p>这就触及到 AI 工程化里一个非常核心的矛盾：<strong>模型“自动触发”的概率性，与工程“红线门禁”的确定性之间的冲突。</strong></p>
+<p>客观地说，现代工具的自动匹配确实好用——靠 <code>SKILL.md</code> 顶部的语义描述，或者靠目录 Glob 规则（比如只要改 <code>tests/</code> 目录下的文件就自动挂载测试规范），AI 很多时候确实能自己找对技能。</p>
+<p>但大模型骨子里有一个很难改掉的毛病，叫“急于写代码（Eager Coding）”。当你提一个看似简单的需求（比如“把优惠券改成能叠加”或者“修一下发货时间没更新”），模型经常会自信地觉得“这小事我直接改了就行”，顺手就把 <code>spec-architect</code> 或 <code>bug-investigator</code> 给跳过去了。在玩具项目里这叫“效率高”，但在复杂项目里，<strong>工程红线要的不是 85% 的自觉，而是 100% 的确定性</strong>。</p>
+<p>所以在真实团队落地 ADD 时，最顺手的策略不是“全自动”或“全手动”二选一，而是<strong>把 Skills 分成两类来驾驭</strong>：</p>
+<ul>
+<li><strong>护栏类（伴随式 → 交给自动触发）：</strong> 比如 <code>ui-fidelity-guard</code>、<code>test-strategist</code>。这类规则只要你在写前端页面、写测试用例就该像空气一样时刻生效，直接靠 <code>description</code> 或路径规则<strong>自动挂载</strong>，省心省力。</li>
+<li><strong>门禁类（阶段式 → 必须显式触发）：</strong> 比如 <code>/spec-architect</code>、<code>/bug-investigator</code>、<code>/drift-auditor</code>、<code>/context-compressor</code>。这些都是卡在关键节点上的安全闸门，用<strong>首行斜杠命令显式触发</strong>，多敲几个字母，换来的是 AI 100% 切换角色、绝不偷懒跳步骤。</li>
+</ul>
+<p><strong>再分享一个跨工具的小技巧：</strong> 客户端通常只在输入文本的最开头（第一行）拦截 <code>/</code> 指令，所以 <code>/xxx</code> 一定要单独放在第一行；同时，我们在 ADD 初始化包的 <code>CLAUDE.md</code> 和 <code>AGENTS.md</code> 里内置了一句兜底约定——<em>“当输入以 <code>/&lt;skill-name&gt;</code> 开头时，若当前环境未自动注入该技能，必须第一时间读取 <code>.claude/skills/&lt;skill-name&gt;/SKILL.md</code> 并严格执行”</em>。这样一来，无论团队成员用的是 Claude Code、Cursor 还是 Windsurf，同一套 <code>/xxx</code> 指令都能无缝通吃。</p>
+<hr>
+<p>把这四个真实场景和 Skills 的分层触发机制连起来看，你会发现 <strong>ADD（锚点驱动开发）</strong> 根本不是什么“繁文缛节”，它恰恰是把日常研发里最容易失控的四种脏活累活，全部收束到了同一条<strong>可预测、可验证的工程闭环</strong>里：<strong>新功能</strong>靠 <code>/spec-architect</code> + <code>UI Manifest</code> + 红灯 TDD 锁死边界，不让 AI 乱发挥；<strong>功能修改</strong>靠顺着反向锚点先改文档 Diff + 增量 TDD 保旧测新，杜绝“改新坏旧”；<strong>Bug 修复</strong>靠 <code>/bug-investigator</code> 先复现失败测试，保证根因找准、永不复发；<strong>功能移除</strong>靠影响面清单 + <code>/drift-auditor</code> 巡检，防死代码、防删库事故。当你习惯了先打好四颗锚点、再让 AI 冲锋，Vibe Coding 才算真正从玩具进化成了能扛住复杂业务的生产力。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+  <script>
+    (function () {
+      var MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 14.2A8.6 8.6 0 0 1 9.8 3.4a8.6 8.6 0 1 0 10.8 10.8Z"/></svg>';
+      var SUN = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>';
+      var root = document.documentElement;
+      var button = document.getElementById('theme-toggle');
+      function current() { return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+      function icon(theme) { return theme === 'light' ? MOON : SUN; }
+      function meta(theme) {
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute('content', theme === 'light' ? '#f3f6f4' : '#0d1115');
+      }
+      function apply(theme) {
+        if (theme === 'light') root.setAttribute('data-theme', 'light');
+        else root.removeAttribute('data-theme');
+        meta(theme);
+        if (button) button.innerHTML = icon(theme);
+      }
+      if (button) {
+        button.innerHTML = icon(current());
+        button.addEventListener('click', function () {
+          var next = current() === 'light' ? 'dark' : 'light';
+          apply(next);
+          try { localStorage.setItem('mblog-theme', next); } catch (e) {}
+        });
+      }
+      var topicMenu = document.querySelector('.article-topic-more');
+      if (topicMenu) {
+        const topicNav = topicMenu.closest('nav');
+        const tabs = topicNav.querySelector('.article-topic-tabs');
+        const items = [...tabs.children];
+        const allTopics = items[0];
+        const currentLink = tabs.querySelector('[aria-current]');
+        const currentTopic = currentLink.parentElement;
+        const overflowList = topicMenu.querySelector('ul');
+        const moreToggle = topicMenu.querySelector('summary');
+        let lastWidth;
+
+        function fitTopicTabs() {
+          const width = topicNav.getBoundingClientRect().width;
+          if (!width) return;
+          lastWidth = width;
+          const focused = document.activeElement;
+          const restoreFocus = topicNav.contains(focused);
+
+          // Measure each topic in the tab strip, where it has its natural width.
+          tabs.append(...items);
+          topicMenu.hidden = false;
+          const gap = parseFloat(getComputedStyle(tabs).columnGap);
+          const widths = items.map(item => item.getBoundingClientRect().width);
+          const totalWidth = widths.reduce((sum, itemWidth) => sum + itemWidth, 0) + gap * (items.length - 1);
+          const overflow = [];
+
+          if (totalWidth > width) {
+            const available = width - topicMenu.getBoundingClientRect().width - parseFloat(getComputedStyle(topicNav).columnGap);
+            let used = widths[0];
+            if (currentTopic !== allTopics) used += gap + widths[items.indexOf(currentTopic)];
+            items.forEach((item, index) => {
+              if (item === allTopics || item === currentTopic) return;
+              const next = used + gap + widths[index];
+              if (next <= available) used = next;
+              else overflow.push(item);
+            });
+          }
+
+          overflowList.replaceChildren(...overflow);
+          topicMenu.hidden = overflow.length === 0;
+          if (topicMenu.hidden) topicMenu.open = false;
+          if (restoreFocus) {
+            const target = topicMenu.contains(focused) && !topicMenu.open
+              ? (topicMenu.hidden ? currentLink : moreToggle)
+              : focused;
+            target.focus({ preventScroll: true });
+          }
+        }
+
+        fitTopicTabs();
+        new ResizeObserver(function () {
+          if (topicNav.getBoundingClientRect().width !== lastWidth) fitTopicTabs();
+        }).observe(topicNav);
+        document.fonts?.ready.then(fitTopicTabs);
+
+        function closeTopicMenuOutside(event) {
+          if (topicMenu.open && !topicMenu.contains(event.target)) topicMenu.open = false;
+        }
+        document.addEventListener('click', closeTopicMenuOutside);
+        document.addEventListener('focusin', closeTopicMenuOutside);
+        topicMenu.addEventListener('keydown', function (event) {
+          if (event.key !== 'Escape' || !topicMenu.open) return;
+          topicMenu.open = false;
+          moreToggle.focus();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

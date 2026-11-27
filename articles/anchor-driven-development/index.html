@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1115">
+  <meta name="description" content="提出索引、反向、视觉边界和验收测试四颗锚点，配合双契约文件与六大 Skills，老项目按三步渐进落地。">
+  <title>别让 AI 在复杂项目里“裸奔”：聊聊我沉淀的 ADD（锚点驱动开发） · 母朝阳</title>
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('mblog-theme'); } catch (e) {}
+      var theme = saved === 'light' || saved === 'dark' ? saved
+        : (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', theme === 'light' ? '#f3f6f4' : '#0d1115');
+    })();
+  </script>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body class="article-page">
+  <a class="article-skip" href="#article-main">跳到正文</a>
+  <div class="article-shell">
+    <header class="article-header">
+      <a class="article-brand" href="../../">母朝阳</a>
+      <nav aria-label="主导航"><a href="../../#articles">返回简历</a><a href="../">文章目录</a><button id="theme-toggle" class="theme-toggle" aria-label="切换浅色/深色主题"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button></nav>
+    </header>
+    <main id="article-main" tabindex="-1">
+      <div class="article-heading">
+        <p class="article-topic">Agent 工具与工程</p>
+        <h1>别让 AI 在复杂项目里“裸奔”：聊聊我沉淀的 ADD（锚点驱动开发）</h1>
+        <p class="article-date">发布于 <time datetime="2026-11-25">2026年11月25日</time></p>
+        <ul class="article-tags" aria-label="能力标签"><li>AI 辅助开发</li><li>锚点驱动开发</li><li>测试策略</li></ul>
+      </div>
+      <div class="article-reading-grid">
+        <aside class="article-sidebar"><details open><summary>本文目录</summary>
+          <nav aria-label="本文目录"><ul><li><a href="#section-1">一、 ADD 的核心哲学：人类定锚点，AI 跑闭环</a></li><li><a href="#section-2">二、 拆解 ADD 的四颗核心锚点</a></li><li><a href="#section-3">三、 驱动四颗锚点运转的“双引擎”：契约文件 + 分层 Skills</a></li><li><a href="#section-4">四、 老项目怎么落地 ADD？（渐进式改造三步走）</a></li></ul></nav>
+        </details></aside>
+        <article class="article-prose"><p>搞 AI 编程的兄弟，估计都跟 <code>ADD</code> 这个词打过交道——在英文里，它是注意力缺陷障碍（Attention Deficit Disorder）的缩写。</p>
+<p>而只要你真拿大模型去维护过一个稍微复杂点的中大型项目，就会发现这名字简直是为现在的 AI 量身定做的：<strong>大模型在长上下文和多轮对话里，天生患有严重的“注意力涣散症”。</strong></p>
+<p>前两轮对话还记得你交代的业务规矩，聊到第十轮就开始放飞自我：需求文档里写得明明白白的校验逻辑它给你漏了；设计图里根本没有的按钮它顺手给你加上了；让它补个测试，它反手给你生成几十个 <code>1+1=2</code> 和自己 Mock 自己断言的垃圾单测，把代码仓库撑得虚胖。</p>
+<p>为什么玩具项目能靠“感觉（Vibe）”一把梭，一进复杂项目就全线崩盘？</p>
+<p>因为<strong>传统软件工程范式（TDD、DDD、BDD）都是为人脑设计的</strong>。人脑的特点是“写代码慢，但业务上下文记得牢”；而 AI 的特点恰恰相反——<strong>“写代码快如闪电，但上下文极易腐烂、极易飘移”</strong>。用管人的老办法去管 AI，必然水土不服。</p>
+<p>为了治好 AI 的“注意力涣散”，我们把实战中沉淀下来的工程约束体系正式命名为 <strong>ADD（Anchor-Driven Development，锚点驱动开发）</strong>。</p>
+<p>如果说 TDD 是用测试用例驱动开发，DDD 是用领域模型驱动开发，那么 <strong>ADD 的核心思想，就是在代码仓库里打下四颗坚硬的物理“锚点”，把飘在半空中的 AI 死死钉在可控的工程地面上。</strong></p>
+<hr>
+<h2 id="section-1">一、 ADD 的核心哲学：人类定锚点，AI 跑闭环</h2>
+<p>在传统的 Vibe Coding 里，开发者扮演的是“甲方”或“聊天对象”，靠嘴皮子一遍遍纠正 AI；而在 <strong>ADD（锚点驱动开发）</strong> 体系下，开发者的角色彻底变成了<strong>架构师、打锚人（Anchor Setter）和验收官</strong>。</p>
+<p>你不需要盯着 AI 写的每一行 <code>if-else</code>，你只需要在项目里打下<strong>四颗定海神针</strong>，让所有的代码生成、UI 还原、测试验证和 Code Review 全部围绕这四颗锚点自动咬合：</p>
+<ol>
+<li><strong>索引锚点（Index Anchor）：</strong> 解决“文档越多、Token 越炸、AI 越傻”的问题；</li>
+<li><strong>规格与代码反向锚点（Spec &amp; Reverse Anchor）：</strong> 解决“文档和代码两张皮、改着改着就失控”的问题；</li>
+<li><strong>视觉边界锚点（Visual Boundary Anchor）：</strong> 解决“前端页面漏状态、多元素、样式乱飘”的问题；</li>
+<li><strong>验收测试锚点（Acceptance Anchor）：</strong> 解决“垃圾单测成堆、测试全绿上线报错”的问题。</li>
+</ol>
+<p>这四颗锚点不是孤立的文档，而是一张相互索引、机器可巡检的立体约束网。</p>
+<hr>
+<h2 id="section-2">二、 拆解 ADD 的四颗核心锚点</h2>
+<h3>1. 索引锚点（<code>docs/INDEX.md</code>）：用渐进式披露省掉 80% 的 Token</h3>
+<p>项目一复杂，需求文档动辄几十上百篇。如果每次干活都让 AI 全盘扫描 <code>docs/</code> 目录，不仅 Token 烧得肉疼，AI 还会因为塞进太多无关背景而把核心规则搞混。</p>
+<p>ADD 要求在文档根目录维护唯一一张极简总表（死守 200 行以内），这就是<strong>索引锚点</strong>：</p>
+<pre><code class="language-markdown"># 需求文档总索引 · 索引锚点 (docs/INDEX.md)
+
+| 业务领域 | 功能模块 | Spec 文档路径 | 关联核心代码 | UI 清单锚点 | 状态 | 一句话业务说明 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 订单 | 结算与算价 | `docs/specs/order/checkout.md` | `src/services/checkout.ts` | `docs/ui-manifest.md#order-checkout` | in-progress | 整数分算价、优惠券互斥、库存预扣 |
+| 订单 | 退款与售后 | `docs/specs/order/refund.md` | `src/services/refund.ts` | `docs/ui-manifest.md#order-refund` | draft | 部分退款、原路退回状态机 |
+
+</code></pre>
+<p><strong>它的威力在于“渐进式披露”：</strong> AI 接到任何任务，第一步只准花几百个 Token 扫一眼这张表，顺藤摸瓜找到目标 Spec 再按需读取，彻底告别盲人摸象。</p>
+<h3>2. 规格与代码反向锚点（<code>docs/specs/</code> + <code>@spec</code>）：双向锁定，永不脱节</h3>
+<p>很多团队也写文档，但写完就扔在飞书或 Confluence 里吃灰，三个月后代码改了十版，文档还停留在第一版。</p>
+<p>ADD 实行严格的 <strong>Docs-as-Code（文档即代码）</strong>，并建立双向绑定：</p>
+<ul>
+<li><strong>正向规格锚点：</strong> 按领域拆成原子化的 Markdown 文件（如 <code>docs/specs/order/checkout.md</code>），<strong>单文件严格控制在 300 行以内</strong>。里面只写三样干货：核心业务规则（含“禁止项”）、接口契约、<code>Given-When-Then</code> 验收标准。记住铁律：<strong>先改 Spec，人工拍板确认，再动一行代码。</strong></li>
+<li><strong>代码反向锚点：</strong> 在每个核心入口文件（Page、Controller、Service）的第一行，强行打上注释锚点：</li>
+</ul>
+<pre><code class="language-typescript">// @spec: docs/specs/order/checkout.md
+// @ui-manifest: docs/ui-manifest.md#order-checkout
+
+</code></pre>
+<ul>
+<li><strong>自动化巡检：</strong> 仓库里放一个几十行的巡检脚本（<code>scripts/check_spec_anchors.py</code>），每次提 PR 前自动扫描所有代码头部的 <code>@spec</code> 路径是否真实存在。只要有人删了文档没改代码，或者改了路径没更新索引，脚本直接报错拦截。</li>
+</ul>
+<h3>3. 视觉边界锚点（<code>docs/ui-manifest.md</code>）：专治前端 AI 的“创作欲”</h3>
+<p>AI 写前端页面最大的毛病是喜欢“自我发挥”——设计图里明明只有 3 个字段，它非给你加个搜索框；或者只写了正常数据展示，把加载态、空数据态、报错态全给吞了。</p>
+<p><strong>视觉边界锚点</strong>就是用来给前端画红线的。在 <code>docs/ui-manifest.md</code> 里，每个页面都要把下面四件事钉死：</p>
+<ul>
+<li><strong>页面路由与布局结构</strong>（防漏页、防响应式错乱）；</li>
+<li><strong>Strict Checklist 与禁止项</strong>（明确写死“允许用哪些组件”以及“严禁在此卡片内显示删除按钮”）；</li>
+<li><strong>必须覆盖的 4 种边界态</strong>（<code>Loading</code> 骨架屏、<code>Empty</code> 空占位、<code>Error</code> 报错拦截、<code>Submitting</code> 防重提交）；</li>
+<li><strong>Playwright 视觉基线路径</strong>（页面写完后自动截真实浏览器渲染图，和设计稿做像素级 Diff 找茬）。</li>
+</ul>
+<h3>4. 验收测试锚点（<code>Given-When-Then</code> + 去 Mock 化）：消灭平行宇宙假测试</h3>
+<p>为什么很多项目的测试形同虚设？因为 AI 喜欢写孤立的单元测试，而且为了省事把数据库和网络请求全 Mock 掉了——Mock 返回 <code>true</code>，然后断言结果等于 <code>true</code>，这种代码除了拉高覆盖率数字，上线时一个 Bug 都拦不住。</p>
+<p>ADD 的第四颗锚点，直接把 Spec 里的 <code>Given-When-Then</code> 转化为不可篡改的<strong>验收测试锚点</strong>：</p>
+<ul>
+<li><strong>采用 Testing Trophy（测试奖杯）策略：</strong> 只有纯算法、算价函数才写单元测试；业务链路重仓<strong>集成测试</strong>和 <strong>E2E 测试</strong>，看到 <code>1+1=2</code> 或测 Getter/Setter 的废话单测直接清理。</li>
+<li><strong>先写红灯测试，再写业务代码：</strong> 逼着 AI 先把 <code>Given-When-Then</code> 写成可执行的测试代码，亲眼看到它运行失败（红灯）并人工确认场景无遗漏后，再让 AI 写业务代码直到测试变绿。</li>
+<li><strong>彻底去 Mock 化：</strong> 后端集成测试直连真实测试库（Testcontainers / Docker Postgres），发真实 HTTP 请求并校验数据库真实落库与回滚状态；前端用 Playwright 跑真实浏览器，只通过用户看得到的文本和角色（<code>getByRole</code>）交互。</li>
+</ul>
+<hr>
+<h2 id="section-3">三、 驱动四颗锚点运转的“双引擎”：契约文件 + 分层 Skills</h2>
+<p>有了四颗锚点，怎么保证 AI 每次干活都乖乖按规矩来，而不是每次都靠人重新交代一遍？靠仓库里的<strong>全局契约文件</strong>和<strong>标准化 Skills</strong>。</p>
+<h3>1. 全局双契约：<code>CLAUDE.md</code> + <code>AGENTS.md</code></h3>
+<p>在项目根目录同时放置 <code>CLAUDE.md</code>（适配 Claude Code）和 <code>AGENTS.md</code>（适配 Cursor、Windsurf、Codex 等通用编辑器），把四颗锚点的工作流写进最高指令里，同时加上一条<strong>跨工具斜杠指令兜底路由</strong>：</p>
+<blockquote>
+<p>当用户输入以 <code>/&lt;skill-name&gt;</code>（如 <code>/spec-architect</code>、<code>/drift-auditor</code>）开头时，若当前编辑器未将其作为原生命令展开，Agent 必须第一时间读取 <code>.claude/skills/&lt;skill-name&gt;/SKILL.md</code> 并严格按其标准作业流程（SOP）执行。</p>
+</blockquote>
+<p>这样一来，无论团队成员用哪款 AI 编辑器，同一套斜杠命令都能无缝通吃。</p>
+<h3>2. 六大工程 Skills：把“自动护栏”和“斜杠门禁”分开用</h3>
+<p>在 <code>.claude/skills/</code> 目录下沉淀 6 个标准化技能，并根据它们的性格分成两类来触发：</p>
+<div class="article-table" tabindex="0" role="region" aria-label="文章表格"><table>
+<thead>
+<tr>
+<th>触发策略</th>
+<th>Skill 名称</th>
+<th>核心职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>护栏类</strong>&lt;br&gt;</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>&lt;br&gt;（伴随式 · 自动触发） | <code>ui-fidelity-guard</code> | 写前端时自动盯紧 <code>ui-manifest.md</code> 视觉锚点与 Design Tokens，验收时调 Playwright 截图比对。 |
+| <strong>护栏类</strong>&lt;br&gt;</p>
+<p>&lt;br&gt;（伴随式 · 自动触发） | <code>test-strategist</code> | 写测试时自动执行 Testing Trophy 原则，拦截 <code>1+1=2</code> 垃圾单测和伪造数据库的过度 Mock。 |
+| <strong>门禁类</strong>&lt;br&gt;</p>
+<p>&lt;br&gt;（节点式 · 首行 <code>/斜杠</code> 触发） | <code>/spec-architect</code> | 立项、改规则、删功能前强制调用，只准输出 Spec 与影响面清单，<strong>严禁直接写代码</strong>。 |
+| <strong>门禁类</strong>&lt;br&gt;</p>
+<p>&lt;br&gt;（节点式 · 首行 <code>/斜杠</code> 触发） | <code>/bug-investigator</code> | 修 Bug 前强制调用，顺着 <code>@spec</code> 反向锚点定位根因，<strong>先写复现失败测试，再动刀修代码</strong>。 |
+| <strong>门禁类</strong>&lt;br&gt;</p>
+<p>&lt;br&gt;（节点式 · 首行 <code>/斜杠</code> 触发） | <code>/drift-auditor</code> | 提 PR 前强制调用，扮演严苛的 Tech Lead 审计 <code>git diff</code> 与四大锚点，巡检反向锚点有效性。 |
+| <strong>门禁类</strong>&lt;br&gt;</p>
+<p>&lt;br&gt;（节点式 · 首行 <code>/斜杠</code> 触发） | <code>/context-compressor</code> | 长对话结束前调用，将架构决策提炼进 <code>ARCHITECTURE.md</code>，把进度浓缩进 <code>PROGRESS.md</code>。 |</p>
+<p>把护栏类交给工具自动挂载，把门禁类用首行 <code>/skill-name</code> 显式卡死，既保留了日常编码的丝滑，又用 100% 的确定性防住了 AI “急于写代码”跳步骤的毛病。</p>
+<hr>
+<h2 id="section-4">四、 老项目怎么落地 ADD？（渐进式改造三步走）</h2>
+<p>很多兄弟看到这里会担心：<em>“我们项目已经有十几万行历史代码了，难道要停工两周把所有老文档全补齐才能用 ADD 吗？”</em></p>
+<p><strong>千万别这么干！</strong> 一次性补全历史文档不仅成本极高，而且写出来的多半是脱离实际的僵尸文档。老项目落地 ADD，讲究的是“新老划断、按需打锚”：</p>
+<ol>
+<li><strong>第一步（10 分钟搭底座）：</strong> 把 <code>CLAUDE.md</code>、<code>AGENTS.md</code>、<code>.claude/skills/</code>、<code>scripts/check_spec_anchors.py</code> 以及一份空的 <code>docs/INDEX.md</code> 和 <code>docs/ui-manifest.md</code> 放进项目根目录。</li>
+<li><strong>第二步（增量立锚点）：</strong> 历史模块只要不动它，就先不管它。从今天起，<strong>所有新增功能</strong>必须先走 <code>/spec-architect</code> 立下新锚点；<strong>所有修改老功能或修 Bug</strong>，改到哪个文件，就顺手把那个模块的 Spec 补出来并在文件头打上 <code>@spec</code> 锚点。</li>
+<li><strong>第三步（卡住 PR 出口）：</strong> 团队约定，任何 PR 合并前必须跑通 <code>check_spec_anchors.py</code>，并用 <code>/drift-auditor</code> 过一遍审计清单。坚持两三个迭代，项目里最核心、变动最频繁的业务模块自然就被四颗锚点全部覆盖了。</li>
+</ol>
+<hr>
+<p>说到底，AI 时代的软件工程，拼的从来不是谁的提示词写得更像魔法咒语，而是<strong>谁能把资深工程师的隐性经验，转化为仓库里显性的工程约束</strong>。<strong>ADD（锚点驱动开发）</strong> 做的事情其实很朴素：用索引锚点管住上下文，用反向锚点管住代码，用视觉锚点管住界面，用验收锚点管住质量。当你把这四颗锚点稳稳打进仓库，Vibe Coding 才算真正告别了“抽盲盒”，变成了一套可预测、可维护、能扛住复杂业务的工业级生产力。</p>
+<a class="article-back" href="../">← 全部文章</a></article>
+      </div></main>
+    <footer class="article-footer"><span>母朝阳 · 技术文章</span><a href="../../#articles">返回简历 ↑</a></footer>
+  </div>
+  <script>
+    (function () {
+      var MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 14.2A8.6 8.6 0 0 1 9.8 3.4a8.6 8.6 0 1 0 10.8 10.8Z"/></svg>';
+      var SUN = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>';
+      var root = document.documentElement;
+      var button = document.getElementById('theme-toggle');
+      function current() { return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+      function icon(theme) { return theme === 'light' ? MOON : SUN; }
+      function meta(theme) {
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute('content', theme === 'light' ? '#f3f6f4' : '#0d1115');
+      }
+      function apply(theme) {
+        if (theme === 'light') root.setAttribute('data-theme', 'light');
+        else root.removeAttribute('data-theme');
+        meta(theme);
+        if (button) button.innerHTML = icon(theme);
+      }
+      if (button) {
+        button.innerHTML = icon(current());
+        button.addEventListener('click', function () {
+          var next = current() === 'light' ? 'dark' : 'light';
+          apply(next);
+          try { localStorage.setItem('mblog-theme', next); } catch (e) {}
+        });
+      }
+      var topicMenu = document.querySelector('.article-topic-more');
+      if (topicMenu) {
+        const topicNav = topicMenu.closest('nav');
+        const tabs = topicNav.querySelector('.article-topic-tabs');
+        const items = [...tabs.children];
+        const allTopics = items[0];
+        const currentLink = tabs.querySelector('[aria-current]');
+        const currentTopic = currentLink.parentElement;
+        const overflowList = topicMenu.querySelector('ul');
+        const moreToggle = topicMenu.querySelector('summary');
+        let lastWidth;
+
+        function fitTopicTabs() {
+          const width = topicNav.getBoundingClientRect().width;
+          if (!width) return;
+          lastWidth = width;
+          const focused = document.activeElement;
+          const restoreFocus = topicNav.contains(focused);
+
+          // Measure each topic in the tab strip, where it has its natural width.
+          tabs.append(...items);
+          topicMenu.hidden = false;
+          const gap = parseFloat(getComputedStyle(tabs).columnGap);
+          const widths = items.map(item => item.getBoundingClientRect().width);
+          const totalWidth = widths.reduce((sum, itemWidth) => sum + itemWidth, 0) + gap * (items.length - 1);
+          const overflow = [];
+
+          if (totalWidth > width) {
+            const available = width - topicMenu.getBoundingClientRect().width - parseFloat(getComputedStyle(topicNav).columnGap);
+            let used = widths[0];
+            if (currentTopic !== allTopics) used += gap + widths[items.indexOf(currentTopic)];
+            items.forEach((item, index) => {
+              if (item === allTopics || item === currentTopic) return;
+              const next = used + gap + widths[index];
+              if (next <= available) used = next;
+              else overflow.push(item);
+            });
+          }
+
+          overflowList.replaceChildren(...overflow);
+          topicMenu.hidden = overflow.length === 0;
+          if (topicMenu.hidden) topicMenu.open = false;
+          if (restoreFocus) {
+            const target = topicMenu.contains(focused) && !topicMenu.open
+              ? (topicMenu.hidden ? currentLink : moreToggle)
+              : focused;
+            target.focus({ preventScroll: true });
+          }
+        }
+
+        fitTopicTabs();
+        new ResizeObserver(function () {
+          if (topicNav.getBoundingClientRect().width !== lastWidth) fitTopicTabs();
+        }).observe(topicNav);
+        document.fonts?.ready.then(fitTopicTabs);
+
+        function closeTopicMenuOutside(event) {
+          if (topicMenu.open && !topicMenu.contains(event.target)) topicMenu.open = false;
+        }
+        document.addEventListener('click', closeTopicMenuOutside);
+        document.addEventListener('focusin', closeTopicMenuOutside);
+        topicMenu.addEventListener('keydown', function (event) {
+          if (event.key !== 'Escape' || !topicMenu.open) return;
+          topicMenu.open = false;
+          moreToggle.focus();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
